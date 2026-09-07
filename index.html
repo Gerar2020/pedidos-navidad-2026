@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Pedido Navidad 2026 · Multi-promoción</title>
+<style>
+:root{--bg:#f4efe7;--card:#fff;--ink:#171717;--muted:#706960;--line:#e5dccf;--soft:#faf7f2;--gold:#b28b57;--ok:#edf7ef;--bad:#fff0ef}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
+.wrap{max-width:1040px;margin:auto;padding:18px}
+.hero{background:#111;color:#fff;border-radius:24px;padding:22px;margin-bottom:14px}
+.hero h1{margin:4px 0;font-size:30px}.hero p{margin:0;opacity:.75}
+.card{background:#fff;border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+h2{font-size:18px;margin:0 0 14px}h3{font-size:15px;margin:16px 0 8px}
+label{display:block;font-size:13px;font-weight:750;margin:10px 0 6px}
+input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);border-radius:13px;padding:12px;background:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.promos{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.btn,.tier{border:1px solid var(--line);background:#fff;border-radius:15px;padding:14px 10px;font-size:14px;font-weight:850;cursor:pointer}
+.btn.active,.tier.active{background:#111;color:#fff}
+.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.hidden{display:none}
+.preview{background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:15px;line-height:1.5}
+.badge{display:inline-block;background:#efe4d4;border-radius:999px;padding:6px 9px;margin:3px;font-size:12px;font-weight:800}
+.product{display:grid;grid-template-columns:1fr 100px 120px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #f0ebe3}
+.product small{display:block;color:var(--muted);margin-top:2px}
+.qty{display:grid;grid-template-columns:30px 40px 30px;gap:4px}.qty button{height:32px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:19px}.qty input{text-align:center;padding:5px;font-size:15px}
+.money{text-align:right;font-weight:800}
+.status{margin-top:10px;padding:10px;border-radius:12px;font-size:13px}.ok{background:var(--ok);color:#24622d}.bad{background:var(--bad);color:#8c3229}
+.totalbox{background:#111;color:white;border-radius:18px;padding:17px;margin-top:14px}.big{font-size:32px;font-weight:900}.muted{opacity:.7;font-size:13px}
+.paygrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.actions{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin-top:14px}
+.actions button{border:0;border-radius:14px;padding:14px;font-size:15px;font-weight:800;cursor:pointer}.primary{background:#111;color:#fff}.secondary{background:#e9dfd1}.ghost{background:#fff;border:1px solid var(--line)!important}
+.orderCard{border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0;background:#fff}
+.orderHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.orderHead b{font-size:16px}.orderActions button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 9px;margin-left:5px;font-weight:700;cursor:pointer}
+.addmore{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.addmore button{border:1px dashed #b7aa98;background:#fffaf3;border-radius:14px;padding:12px 8px;font-weight:800;cursor:pointer}
+.summaryTotal{font-size:28px;font-weight:900;margin-top:8px}
+.note{font-size:12px;color:var(--muted);line-height:1.45}
+
+
+.bonusSection{
+  margin-top:18px;
+  padding:14px;
+  border-radius:16px;
+  background:#fff8ef;
+  border:1px solid #ead7ba;
+  border-left:6px solid #b28b57;
+}
+.bonusSection h3{margin:0 0 8px;color:#7b5a2f}
+.sectionDivider{
+  margin:18px 0 10px;
+  border-top:3px solid #b28b57;
+  padding-top:10px;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.02em;
+  color:#7b5a2f;
+}
+.fpRows{display:grid;gap:7px}
+.fpRow{display:grid;grid-template-columns:145px 1fr auto;gap:9px;align-items:center}
+.fpRowLabel{font-size:11px;font-weight:800;opacity:.88}
+.fpMiniBar{height:7px;background:rgba(255,255,255,.18);border-radius:999px;overflow:hidden}
+.fpMiniFill{height:100%;width:0%;background:#fff;border-radius:999px;transition:width .18s ease}
+.fpMiniFill.bonus{background:#e8c68d}
+.fpRowValue{font-size:11px;font-weight:900;white-space:nowrap}
+
+.amountToggle{
+  display:flex;align-items:center;gap:8px;margin-top:12px;
+  padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff
+}
+.amountToggle input{width:auto;transform:scale(1.15)}
+.amountHidden{
+  font-size:24px;font-weight:900;letter-spacing:.08em
+}
+
+.bonusAuto{
+  margin-top:10px;
+  padding:11px 12px;
+  border-radius:12px;
+  background:#f5ead8;
+  color:#6f522d;
+  font-size:13px;
+  font-weight:700;
+}
+
+.floatingProgress{
+  position:sticky;
+  bottom:12px;
+  z-index:40;
+  margin-top:14px;
+  background:rgba(17,17,17,.94);
+  color:#fff;
+  border-radius:16px;
+  padding:10px 12px;
+  box-shadow:0 8px 26px rgba(0,0,0,.20);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.floatingProgress.hidden{display:none}
+.fpTop{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:7px}
+.fpTitle{font-size:13px;font-weight:800}
+.fpRemain{font-size:13px;font-weight:900}
+.fpBar{height:8px;background:rgba(255,255,255,.18);border-radius:999px;overflow:hidden}
+.fpFill{height:100%;width:0%;background:#fff;border-radius:999px;transition:width .18s ease}
+.fpBottom{display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:11px;opacity:.82}
+.fpBonus{white-space:nowrap}
+.fpOk{color:#bff0c8}
+.fpWarn{color:#ffd6a6}
+
+@media(max-width:800px){
+ .grid2,.promos,.paygrid,.actions,.addmore{grid-template-columns:1fr}
+ .tiers{grid-template-columns:repeat(2,1fr)}
+ .product{grid-template-columns:1fr 100px}.money{grid-column:1/3;text-align:left;padding-left:4px}
+}
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pedidos Xmas">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+
+<style>
+#appSplash{position:fixed;inset:0;background:#111;color:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .25s ease}
+#appSplash.hide{opacity:0;pointer-events:none}
+#appSplash .box{text-align:center;padding:28px}
+#appSplash img{width:104px;height:104px;border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+#appSplash h1{font-size:24px;margin:16px 0 4px}
+#appSplash p{margin:0;opacity:.72;font-size:14px}
+</style>
+
+</head>
+<body>
+
+<div id="appSplash">
+  <div class="box">
+    <img src="icons/icon-192.png" alt="">
+    <h1>Pedidos Navidad 2026</h1>
+    <p>Skeyndor · herramienta comercial</p>
+  </div>
+</div>
+<div class="wrap">
+
+<div class="hero">
+  <small>Skeyndor · Navidad 2026</small>
+  <h1>Pedido rápido comercial</h1>
+  <p>Una hoja por cliente, con una o varias promociones.</p>
+</div>
+
+<div class="card">
+  <h2>1. Datos del cliente y comercial</h2>
+  <div class="grid2">
+    <div><label>Cliente</label><input id="cliente" placeholder="Nombre del cliente"></div>
+    <div><label>Nº cliente</label><input id="numCliente" placeholder="Código cliente"></div>
+  </div>
+  <div class="grid2">
+    <div><label>Comercial</label><input id="comercial" placeholder="Nombre del comercial"></div>
+    <div><label>Email del comercial</label><input id="email" type="email" placeholder="nombre@skeyndor.com"></div>
+  </div>
+  <div class="note" style="margin-top:8px">El nombre y el email del comercial se guardan solo en este dispositivo para no tener que escribirlos cada vez.</div>
+</div>
+
+<div class="card">
+  <h2>2. Añadir una promoción</h2>
+  <div class="promos">
+    <button class="btn promo" data-promo="power">Power & Premium</button>
+    <button class="btn promo" data-promo="timeless">Timeless Prodigy</button>
+    <button class="btn promo" data-promo="aquatherm">Aquatherm</button>
+    <button class="btn promo" data-promo="perfumes">Perfumes</button>
+    <button class="btn promo" data-promo="cabina">Packs cabina 3+1</button>
+  </div>
+</div>
+
+<div class="card hidden" id="builderCard">
+  <h2>3. Configurar promoción</h2>
+  <div id="builderTitle" class="preview"></div>
+  <h3>Tramo</h3>
+  <div class="tiers" id="tiers"></div>
+  <div id="productArea" class="hidden">
+    <h3>Composición</h3>
+    <div id="logicInfo" class="preview"></div>
+    <div id="products"></div>
+    <div id="validation"></div>
+    <div id="floatingProgress" class="floatingProgress hidden">
+      <div class="fpTop">
+        <div class="fpTitle" id="fpTitle">Progreso del pedido</div>
+        <div class="fpRemain" id="fpRemain">Faltan 0</div>
+      </div>
+      <div class="fpRows">
+        <div class="fpRow">
+          <div class="fpRowLabel">FACTURADO</div>
+          <div class="fpMiniBar"><div class="fpMiniFill" id="fpFill"></div></div>
+          <div class="fpRowValue" id="fpMain">0 / 0</div>
+        </div>
+        <div class="fpRow hidden" id="fpBonusRow">
+          <div class="fpRowLabel">BONIFICADO</div>
+          <div class="fpMiniBar"><div class="fpMiniFill bonus" id="fpBonusFill"></div></div>
+          <div class="fpRowValue" id="fpBonus">0 / 0</div>
+        </div>
+      </div>
+    </div>
+    <div class="totalbox">
+      <div class="muted">IMPORTE DE ESTA PROMOCIÓN</div>
+      <div class="amountHidden" id="promoTotalHidden">•••••• €</div>
+      <div class="big hidden" id="promoTotal">0,00 €</div>
+      <div class="muted hidden" id="discountLine"></div>
+      <label class="amountToggle">
+        <input id="showPromoAmount" type="checkbox">
+        <span>Ver importe del pedido</span>
+      </label>
+    </div>
+    <h3>Financiación de esta promoción</h3>
+    <div class="paygrid">
+      <div><label>Máximo por importe</label><input id="maxPayments" readonly></div>
+      <div><label>Nº recibos elegido</label><select id="payments"></select></div>
+      <div><label>Importe por recibo</label><input id="monthly" readonly></div>
+    </div>
+    <div class="actions">
+      <button class="primary" onclick="addConfiguredOrder()">Añadir esta promoción</button>
+      <button class="ghost" onclick="cancelBuilder()">Cancelar</button>
+      <span></span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>4. Pedidos añadidos</h2>
+  <div id="ordersList" class="preview">Todavía no has añadido ninguna promoción.</div>
+  <div id="addMoreBlock" class="hidden">
+    <h3>¿Quieres añadir alguna otra familia de pedido?</h3>
+    <div class="addmore">
+      <button onclick="startPromo('power')">+ Power & Premium</button>
+      <button onclick="startPromo('timeless')">+ Timeless Prodigy</button>
+      <button onclick="startPromo('aquatherm')">+ Aquatherm</button>
+      <button onclick="startPromo('perfumes')">+ Perfumes</button>
+      <button onclick="startPromo('cabina')">+ Packs cabina</button>
+    </div>
+  </div>
+</div>
+
+<div class="card hidden" id="finalCard">
+  <h2>5. Resumen final del cliente</h2>
+  <div id="combinedNote" class="hidden status ok"></div>
+  <label class="amountToggle" style="margin-bottom:10px">
+    <input id="showFinalAmount" type="checkbox">
+    <span>Ver importes en el resumen final</span>
+  </label>
+  <div id="finalPreview" class="preview"></div>
+  <label>Observaciones generales</label>
+  <textarea id="obs" placeholder="Notas para introducir después en CRM"></textarea>
+  <div class="actions">
+    <button class="primary" onclick="sendMail()">Enviar a mi email</button>
+    <button class="secondary" onclick="copySummary()">Copiar resumen</button>
+    <button class="ghost" onclick="window.print()">Guardar / imprimir PDF</button>
+  </div>
+  <div class="note" style="margin-top:10px">“Enviar a mi email” abre la app Mail del iPad con destinatario, asunto y cuerpo ya preparados. El comercial solo tiene que pulsar Enviar.</div>
+</div>
+
+</div>
+
+<script>
+const DATA={
+ power:{title:"Power & Premium",tiers:[
+  {buy:10,aq:0,perf:5,b60:5,bex:10,kit:0,disc:0},{buy:15,aq:3,perf:7,b60:12,bex:15,kit:1,disc:0},
+  {buy:20,aq:4,perf:9,b60:13,bex:20,kit:1,disc:0},{buy:30,aq:7,perf:10,b60:17,bex:30,kit:1,disc:3},
+  {buy:50,aq:11,perf:15,b60:26,bex:50,kit:1,disc:5},{buy:60,aq:14,perf:18,b60:32,bex:60,kit:1,disc:6},
+  {buy:70,aq:17,perf:22,b60:39,bex:70,kit:1,disc:9},{buy:90,aq:22,perf:28,b60:50,bex:90,kit:1,disc:12}]},
+ timeless:{title:"Timeless Prodigy",tiers:[
+  {buy:8,bonus:1,perf:4,b60:4,bex:9,kit:1},{buy:12,bonus:2,perf:6,b60:6,bex:14,kit:1},
+  {buy:18,bonus:3,perf:9,b60:9,bex:21,kit:1},{buy:24,bonus:4,perf:12,b60:12,bex:28,kit:1}]},
+ aquatherm:{title:"Aquatherm",tiers:[{label:"9 + 1",buy:9,bonus:1,b60:10},{label:"12 + 3",buy:12,bonus:3,b60:15}]},
+ perfumes:{title:"Perfumes",tiers:[{label:"10 + 1",buy:10,bonus:1},{label:"18 + 2",buy:18,bonus:2}]},
+ cabina:{title:"Packs de cabina",tiers:[{label:"3 + 1",buy:3,bonus:1}]}
+};
+
+const PRODUCTS={
+ power:[
+  ["correctiveCrema","Corrective · Crema",76],["correctiveEmulsion","Corrective · Emulsión",76],
+  ["globalSecas","Global Lift · Pieles secas",73],["globalMixtas","Global Lift · Pieles mixtas",73],
+  ["eternalCrema","Eternal · Crema",67],["eternalRica","Eternal · Crema rica",67],
+  ["phCrema","Power Hyaluronic · Crema",50],["phEmulsion","Power Hyaluronic · Emulsión",50],
+  ["pcCrema","Power C+ · Crema",53],["pcEmulsion","Power C+ · Emulsión",53],
+  ["retinolCrema","Power Retinol · Crema",57],["retinolEmulsion","Power Retinol · Emulsión",57],
+  ["oxygenCrema","Power Oxygen · Crema",57],["oxygenEmulsion","Power Oxygen · Emulsión",57]
+ ],
+ timeless:[["timelessCream","Timeless Prodigy · The Cream",79],["timelessSerum","Timeless Prodigy · The Serum",85]],
+ aquatherm:[["aquaSecas","Aquatherm · Normales a secas",30],["aquaGrasas","Aquatherm · Normales a grasas",30]],
+ perfumes:[["perfume","Perfume",23]],
+ cabina:[
+["cabAquatherm","Programa profesional pieles sensibles Aquatherm",51.30],
+["cabHyaluronic","Programa profesional Power Hyaluronic",62.40],
+["cabPowerC","Programa profesional Power C iluminador",61.40],
+["cabOxygen","Programa oxígeno y antipolución",72.75],
+["cabRetinol","Programa profesional intenso de retinol",68.05],
+["cabCorrective","Tratamiento corrector de arrugas",100.60],
+["cabEternal","Programa profesional redensificante Eternal",79.40],
+["cabGlobal","Programa Lifting antigravedad Global Lift",95.10],
+["cabProdigy","Tratamiento profesional Timeless Prodigy",154.20]
+]
+};
+
+let currentPromo=null,currentTier=null,currentQty={},editingIndex=null;
+let orders=[];
+const $=x=>document.getElementById(x);
+const eur=n=>n.toLocaleString("es-ES",{style:"currency",currency:"EUR"});
+
+function loadLocal(){
+  $("comercial").value=localStorage.getItem("xmas_comercial")||"";
+  $("email").value=localStorage.getItem("xmas_email")||"";
+}
+$("comercial").addEventListener("input",()=>localStorage.setItem("xmas_comercial",$("comercial").value));
+$("email").addEventListener("input",()=>localStorage.setItem("xmas_email",$("email").value));
+loadLocal();
+
+document.querySelectorAll(".promo").forEach(b=>b.onclick=()=>startPromo(b.dataset.promo));
+
+function startPromo(key,index=null){
+ currentPromo=key; currentTier=null; currentQty={}; editingIndex=index;
+ document.querySelectorAll(".promo").forEach(x=>x.classList.toggle("active",x.dataset.promo===key));
+ $("builderTitle").innerHTML=`<b>${DATA[key].title}</b><br>Selecciona el tramo y configura la composición.`;
+ renderTiers();
+ $("builderCard").classList.remove("hidden");
+ $("productArea").classList.add("hidden");
+ $("showPromoAmount").checked=false;
+ $("promoTotal").classList.add("hidden");$("promoTotalHidden").classList.remove("hidden");$("discountLine").classList.add("hidden");
+ window.scrollTo({top:$("builderCard").offsetTop-10,behavior:"smooth"});
+}
+function renderTiers(){
+ $("tiers").innerHTML="";
+ DATA[currentPromo].tiers.forEach((t,i)=>{
+   let b=document.createElement("button"); b.className="tier"; b.textContent=t.label||t.buy+" cofres";
+   b.onclick=()=>selectTier(i,b); $("tiers").appendChild(b);
+ });
+}
+function selectTier(i,b){
+ currentTier=i;currentQty={};
+ document.querySelectorAll(".tier").forEach(x=>x.classList.toggle("active",x===b));
+ renderDetail();$("productArea").classList.remove("hidden");calcCurrent();
+}
+function renderDetail(){
+ const t=DATA[currentPromo].tiers[currentTier];let info="";
+ if(currentPromo==="power") info=`<b>Power & Premium</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Aquatherm bonificados ${t.aq}</span><span class="badge">Perfumes ${t.perf}</span><span class="badge">Descuento ${t.disc}%</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
+ if(currentPromo==="timeless") info=`<b>Timeless Prodigy</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus} The Cream</span><span class="badge">Perfumes ${t.perf}</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
+ if(currentPromo==="aquatherm") info=`<b>Aquatherm</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">Bolsas aniversario ${t.b60}</span>`;
+ if(currentPromo==="perfumes") info=`<b>Perfumes</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">PVE 23 €</span><span class="badge">PVP 49 €</span>`;
+ if(currentPromo==="cabina") info=`<b>Packs de cabina</b><br><span class="badge">Compra 3</span><span class="badge">Bonifica 1</span><br>Mix entre programas profesionales. El bonificado será siempre el de menor PVE entre los 3 seleccionados.`;
+ $("logicInfo").innerHTML=info;
+
+ let html="";
+ PRODUCTS[currentPromo].forEach(([id,name,price])=>{
+   currentQty[id]=0;
+   html+=`<div class="product"><div><b>${name}</b><small>${price?`PVE ${eur(price)}`:"Precio pendiente"}</small></div>
+   <div class="qty"><button onclick="chg('${id}',-1)">−</button><input id="q_${id}" value="0" readonly><button onclick="chg('${id}',1)">+</button></div>
+   <div class="money" id="m_${id}">${eur(0)}</div></div>`;
+ });
+ if(currentPromo==="power"&&t.aq>0){
+   currentQty.bonSecas=0;currentQty.bonGrasas=0;
+   html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIÓN · SIN CARGO</div>`;
+   html+=`<h3>Reparto de cofres Aquatherm bonificados</h3>`;
+   html+=bonusRow("bonSecas","Aquatherm bonificado · normales a secas")+bonusRow("bonGrasas","Aquatherm bonificado · normales a grasas");
+   html+=`</div>`;
+ }
+ if(currentPromo==="cabina"){
+   html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIÓN · SIN CARGO</div>
+   <div class="bonusAuto" id="cabinaBonusAuto">El pack bonificado será automáticamente el de menor PVE entre los packs incluidos en la compra.</div></div>`;
+ }
+ $("products").innerHTML=html;
+}
+function bonusRow(id,name){return `<div class="product"><div><b>${name}</b><small>Sin cargo</small></div><div class="qty"><button onclick="chgBonus('${id}',-1)">−</button><input id="q_${id}" value="0" readonly><button onclick="chgBonus('${id}',1)">+</button></div><div class="money">0,00 €</div></div>`}
+function boughtCount(){return PRODUCTS[currentPromo].reduce((s,[id])=>s+(currentQty[id]||0),0)}
+function chg(id,d){const max=DATA[currentPromo].tiers[currentTier].buy;if(d>0&&boughtCount()>=max)return;currentQty[id]=Math.max(0,(currentQty[id]||0)+d);$("q_"+id).value=currentQty[id];calcCurrent()}
+function chgBonus(id,d){const max=DATA[currentPromo].tiers[currentTier].aq||0;const now=(currentQty.bonSecas||0)+(currentQty.bonGrasas||0);if(d>0&&now>=max)return;currentQty[id]=Math.max(0,(currentQty[id]||0)+d);$("q_"+id).value=currentQty[id];calcCurrent()}
+
+function financeMax(promo,total){
+ if(promo==="timeless"){
+   if(total>=1400)return 4;if(total>=900)return 3;if(total>=600)return 2;return 1;
+ }
+ if(promo==="power"){
+   if(total>=4900)return 10;if(total>=4000)return 9;if(total>=3500)return 8;if(total>=3000)return 7;if(total>=2400)return 6;if(total>=1800)return 4;if(total>=900)return 3;if(total>=600)return 2;return 1;
+ }
+ return 1;
+}
+function setPaymentOptions(max){
+ const old=parseInt($("payments").value||1);$("payments").innerHTML="";
+ for(let i=1;i<=max;i++){let o=document.createElement("option");o.value=i;o.textContent=i===1?"Contado":i+" recibos";$("payments").appendChild(o)}
+ $("payments").value=Math.min(old,max);
+}
+$("payments").addEventListener("change",calcCurrent);
+
+$("showPromoAmount").addEventListener("change",()=>{
+  const show=$("showPromoAmount").checked;
+  $("promoTotal").classList.toggle("hidden",!show);
+  $("promoTotalHidden").classList.toggle("hidden",show);
+  $("discountLine").classList.toggle("hidden",!show);
+});
+$("showFinalAmount").addEventListener("change",renderFinal);
+
+
+function currentGross(){
+ let g=0;PRODUCTS[currentPromo].forEach(([id,,price])=>g+=(currentQty[id]||0)*price);return g;
+}
+
+function cabinaBonusInfo(qtyObj=currentQty){
+ if(currentPromo!=="cabina" && !(qtyObj && ("cabPower" in qtyObj || "cabPremium" in qtyObj))) return null;
+ const candidates=[];
+ PRODUCTS.cabina.forEach(([id,name,price])=>{
+   if((qtyObj[id]||0)>0) candidates.push({id,name,price});
+ });
+ if(!candidates.length) return null;
+ const priced=candidates.filter(x=>x.price>0);
+ if(!priced.length) return {name:"Pendiente de precios",price:0,pending:true};
+ priced.sort((a,b)=>a.price-b.price);
+ return {name:priced[0].name,price:priced[0].price,pending:false};
+}
+
+function currentValid(){
+ const t=DATA[currentPromo].tiers[currentTier];let v=boughtCount()===t.buy;
+ if(currentPromo==="power"&&t.aq>0)v=v&&((currentQty.bonSecas||0)+(currentQty.bonGrasas||0)===t.aq);
+ return v;
+}
+
+function updateFloatingProgress(){
+  if(currentPromo===null||currentTier===null){$("floatingProgress").classList.add("hidden");return}
+  const t=DATA[currentPromo].tiers[currentTier];
+  const selected=boughtCount();
+  const total=t.buy||0;
+  const remaining=Math.max(0,total-selected);
+  const pct=total?Math.min(100,(selected/total)*100):0;
+
+  $("floatingProgress").classList.remove("hidden");
+  $("fpFill").style.width=pct+"%";
+  $("fpMain").textContent=`${selected} / ${total}`;
+  $("fpRemain").textContent=remaining===0?"Facturado completo ✓":`Faltan ${remaining} facturados`;
+  $("fpRemain").className="fpRemain "+(remaining===0?"fpOk":"fpWarn");
+  $("fpTitle").textContent=DATA[currentPromo].title;
+
+  let bonusTotal=0, bonusSelected=0, bonusLabel="";
+  if(currentPromo==="power" && (t.aq||0)>0){
+    bonusTotal=t.aq;
+    bonusSelected=(currentQty.bonSecas||0)+(currentQty.bonGrasas||0);
+    bonusLabel="Aquatherm";
+  }else if(currentPromo==="timeless"){
+    bonusTotal=t.bonus||0; bonusSelected=bonusTotal; bonusLabel="Prodigy Cream";
+  }else if(currentPromo==="aquatherm"){
+    bonusTotal=t.bonus||0; bonusSelected=bonusTotal; bonusLabel="Aquatherm";
+  }else if(currentPromo==="perfumes"){
+    bonusTotal=t.bonus||0; bonusSelected=bonusTotal; bonusLabel="Perfumes";
+  }else if(currentPromo==="cabina"){
+    bonusTotal=t.bonus||0; bonusSelected=(boughtCount()===t.buy?bonusTotal:0); bonusLabel="Pack cabina";
+  }
+
+  if(bonusTotal>0){
+    $("fpBonusRow").classList.remove("hidden");
+    const bpct=Math.min(100,(bonusSelected/bonusTotal)*100);
+    $("fpBonusFill").style.width=bpct+"%";
+    const brem=Math.max(0,bonusTotal-bonusSelected);
+    $("fpBonus").textContent=brem===0?`${bonusLabel}: ${bonusSelected}/${bonusTotal} ✓`:`${bonusLabel}: ${bonusSelected}/${bonusTotal} · faltan ${brem}`;
+    $("fpBonus").className="fpRowValue "+(brem===0?"fpOk":"fpWarn");
+  }else{
+    $("fpBonusRow").classList.add("hidden");
+    $("fpBonusFill").style.width="0%";
+    $("fpBonus").textContent="";
+  }
+}
+
+function calcCurrent(){
+ if(currentPromo===null||currentTier===null)return;
+ const t=DATA[currentPromo].tiers[currentTier];const gross=currentGross();const disc=currentPromo==="power"?(t.disc||0):0;const total=gross*(1-disc/100);
+ PRODUCTS[currentPromo].forEach(([id,,price])=>{let el=$("m_"+id);if(el)el.textContent=eur((currentQty[id]||0)*price)});
+ $("promoTotal").textContent=eur(total);
+ $("discountLine").textContent=disc?`Antes descuento: ${eur(gross)} · descuento ${disc}%`:"";
+ const showAmt=$("showPromoAmount").checked;
+ $("promoTotal").classList.toggle("hidden",!showAmt);
+ $("promoTotalHidden").classList.toggle("hidden",showAmt);
+ $("discountLine").classList.toggle("hidden",!showAmt);
+ let count=boughtCount(),txt=`Seleccionados: ${count} de ${t.buy}`;
+ if(currentPromo==="power"&&t.aq>0)txt+=` · Aquatherm bonificados: ${(currentQty.bonSecas||0)+(currentQty.bonGrasas||0)} de ${t.aq}`;
+ $("validation").className="status "+(currentValid()?"ok":"bad");$("validation").textContent=txt;
+ const max=financeMax(currentPromo,total);$("maxPayments").value=max===1?"Contado":max+" recibos";setPaymentOptions(max);
+ const n=parseInt($("payments").value||1);$("monthly").value=eur(total/n);
+ if(currentPromo==="cabina"){
+   const bi=cabinaBonusInfo();
+   const el=$("cabinaBonusAuto");
+   if(el){
+     if(!bi) el.textContent="El pack bonificado será automáticamente el de menor PVE entre los 3 packs seleccionados.";
+     else if(bi.pending) el.textContent="Pack bonificado automático: pendiente de cargar los precios de los packs de cabina.";
+     else el.textContent=`Pack bonificado automático: ${bi.name} (${eur(bi.price)}), por ser el de menor PVE de los seleccionados.`;
+   }
+ }
+ updateFloatingProgress();
+}
+function addConfiguredOrder(){
+ if(!currentValid()){alert("Completa todas las unidades del tramo antes de añadir la promoción.");return}
+ const t=DATA[currentPromo].tiers[currentTier];const gross=currentGross();const disc=currentPromo==="power"?(t.disc||0):0;const total=gross*(1-disc/100);const payments=parseInt($("payments").value||1);
+ const order={promo:currentPromo,tier:currentTier,qty:JSON.parse(JSON.stringify(currentQty)),gross,disc,total,payments};
+ if(editingIndex===null)orders.push(order);else orders[editingIndex]=order;
+ cancelBuilder();renderOrders();
+}
+function cancelBuilder(){
+ currentPromo=null;currentTier=null;currentQty={};editingIndex=null;$("builderCard").classList.add("hidden");$("floatingProgress").classList.add("hidden");document.querySelectorAll(".promo").forEach(x=>x.classList.remove("active"));
+}
+function removeOrder(i){orders.splice(i,1);renderOrders()}
+function editOrder(i){
+ const o=orders[i];startPromo(o.promo,i);currentTier=o.tier;currentQty=JSON.parse(JSON.stringify(o.qty));
+ const tb=document.querySelectorAll(".tier")[currentTier];if(tb)tb.classList.add("active");
+ renderDetail();
+ Object.keys(currentQty).forEach(id=>{let el=$("q_"+id);if(el)el.value=currentQty[id]});
+ $("productArea").classList.remove("hidden");calcCurrent();$("payments").value=o.payments;calcCurrent();
+}
+
+function orderLines(o){
+ const p=o.promo,t=DATA[p].tiers[o.tier],lines=[];
+ PRODUCTS[p].forEach(([id,name])=>{if(o.qty[id])lines.push(`${name}: ${o.qty[id]}`)});
+ if(p==="power"&&t.aq>0){
+  if(o.qty.bonSecas)lines.push(`Aquatherm bonif. normales a secas: ${o.qty.bonSecas}`);
+  if(o.qty.bonGrasas)lines.push(`Aquatherm bonif. normales a grasas: ${o.qty.bonGrasas}`);
+  lines.push(`Perfumes regalo: ${t.perf}`,`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`,`Descuento: ${t.disc}%`);
+ }
+ if(p==="timeless")lines.push(`Bonificación The Cream: ${t.bonus}`,`Perfumes regalo: ${t.perf}`,`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`);
+ if(p==="aquatherm")lines.push(`Bonificación Aquatherm: ${t.bonus}`,`Bolsas aniversario: ${t.b60}`);
+ if(p==="perfumes")lines.push(`Perfumes bonificados: ${t.bonus}`);
+ if(p==="cabina"){
+   const candidates=[];
+   PRODUCTS.cabina.forEach(([id,name,price])=>{if((o.qty[id]||0)>0)candidates.push({name,price})});
+   const priced=candidates.filter(x=>x.price>0).sort((a,b)=>a.price-b.price);
+   if(priced.length) lines.push(`Pack bonificado: 1 × ${priced[0].name} (menor PVE: ${eur(priced[0].price)})`);
+   else lines.push(`Pack bonificado: 1 × pack de menor PVE (precio pendiente)`);
+ }
+ return lines;
+}
+function renderOrders(){
+ if(!orders.length){
+   $("ordersList").innerHTML="Todavía no has añadido ninguna promoción.";$("addMoreBlock").classList.add("hidden");$("finalCard").classList.add("hidden");return;
+ }
+ let html="";
+ orders.forEach((o,i)=>{
+  const t=DATA[o.promo].tiers[o.tier];
+  html+=`<div class="orderCard"><div class="orderHead"><div><b>${i+1}. ${DATA[o.promo].title}</b><br><span class="badge">Tramo ${t.label||t.buy}</span><span class="badge">${eur(o.total)}</span><span class="badge">${o.payments===1?"Contado":o.payments+" recibos"}</span></div>
+  <div class="orderActions"><button onclick="editOrder(${i})">Editar</button><button onclick="removeOrder(${i})">Eliminar</button></div></div>
+  <div class="note" style="margin-top:8px">${orderLines(o).join(" · ")}</div></div>`;
+ });
+ $("ordersList").innerHTML=html;$("addMoreBlock").classList.remove("hidden");$("finalCard").classList.remove("hidden");
+ if(!$("showFinalAmount").dataset.touched){$("showFinalAmount").checked=false;$("showFinalAmount").dataset.touched="1";}
+ renderFinal();
+}
+function combinedExtraMonth(){
+ return orders.some(o=>o.promo==="power")&&orders.some(o=>o.promo==="timeless");
+}
+function renderFinal(){
+ const total=orders.reduce((s,o)=>s+o.total,0);
+ const showAmounts=$("showFinalAmount") ? $("showFinalAmount").checked : false;
+ let html="";
+ orders.forEach((o,i)=>{
+   const t=DATA[o.promo].tiers[o.tier];
+   html+=`<b>PEDIDO ${i+1} — ${DATA[o.promo].title}</b><br>Tramo: ${t.label||t.buy}<br>${orderLines(o).join("<br>")}`;
+   if(showAmounts){
+     html+=`<br>Importe: <b>${eur(o.total)}</b><br>Pago: ${o.payments===1?"Contado":o.payments+" recibos de "+eur(o.total/o.payments)}<br><br>`;
+   }else{
+     html+=`<br>Forma de pago: ${o.payments===1?"Contado":o.payments+" recibos"}<br><br>`;
+   }
+ });
+ if(showAmounts) html+=`<div class="summaryTotal">TOTAL OPERACIÓN: ${eur(total)}</div>`;
+ else html+=`<div class="summaryTotal">TOTAL OPERACIÓN: oculto</div>`;
+ $("finalPreview").innerHTML=html;
+ if(combinedExtraMonth()){
+   $("combinedNote").classList.remove("hidden");
+   $("combinedNote").textContent="Power/Premium + Timeless Prodigy: según la condición de financiación aportada, dispone de 1 mes adicional de pago.";
+ }else $("combinedNote").classList.add("hidden");
+}
+$("obs").addEventListener("input",renderFinal);
+
+function fullText(){
+ const total=orders.reduce((s,o)=>s+o.total,0);let s=`PEDIDO NAVIDAD 2026
+
+Cliente: ${$("cliente").value||"-"}
+Nº cliente: ${$("numCliente").value||"-"}
+Comercial: ${$("comercial").value||"-"}
+
+`;
+ orders.forEach((o,i)=>{
+   const t=DATA[o.promo].tiers[o.tier];
+   s+=`PEDIDO ${i+1} — ${DATA[o.promo].title}
+Tramo: ${t.label||t.buy}
+${orderLines(o).join("\n")}
+Importe: ${eur(o.total)}
+Forma de pago: ${o.payments===1?"Contado":o.payments+" recibos"}
+Cuota: ${eur(o.total/o.payments)}
+
+`;
+ });
+ s+=`TOTAL OPERACIÓN: ${eur(total)}
+`;
+ if(combinedExtraMonth())s+=`\nNOTA FINANCIACIÓN: Power/Premium + Timeless Prodigy dispone de 1 mes adicional de pago.\n`;
+ s+=`\nObservaciones generales: ${$("obs").value||"-"}\n\nRecordatorio comercial para posterior introducción en CRM.`;
+ return s;
+}
+function sendMail(){
+ if(!orders.length){alert("Añade al menos una promoción.");return}
+ if(!$("email").value.trim()){alert("Indica el email del comercial.");return}
+ const subject=`Pedido Navidad 2026 - ${$("cliente").value||"Cliente"}`;
+ location.href=`mailto:${encodeURIComponent($("email").value)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullText())}`;
+}
+async function copySummary(){try{await navigator.clipboard.writeText(fullText());alert("Resumen copiado.")}catch(e){alert("No se pudo copiar automáticamente.")}}
+</script>
+
+<script>
+window.addEventListener('load',()=>{
+  const sp=document.getElementById('appSplash');
+  setTimeout(()=>{sp.classList.add('hide');setTimeout(()=>sp.remove(),300)},650);
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
+});
+</script>
+
+</body>
+</html>

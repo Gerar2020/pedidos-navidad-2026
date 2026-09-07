@@ -1,9 +1,7 @@
-Pedidos Navidad 2026 · v13
+Pedidos Navidad 2026 · v14
 
-Cambios:
-- Corregido selector de Aquatherm bonificado en Power & Premium.
-- Eliminada la forma de pago de cada promoción individual.
-- La forma de pago se elige una sola vez al final, sobre el total de todas las promociones.
-- Escala de financiación aplicada al total global; desde 300 € se habilitan 2 recibos a 30/60 días.
-- Si el pedido combina Power/Premium + Timeless Prodigy, se añade 1 recibo al máximo global.
-- Resumen final y PDF muestran una única forma de pago global.
+Cambios visuales:
+- "Añadir una promoción" pasa a un faldón CTA oscuro y más visible.
+- "¿Quieres añadir alguna otra familia de pedido?" cambia a "¿Quieres añadir alguna otra promoción?".
+- El segundo faldón CTA usa un tono dorado/beige más comercial y diferenciador.
+- "Packs cabina 3+1" se renombra a "Packs de cabina" porque ahora incluye 3+1, 6+2 y 9+3.

@@ -81,6 +81,51 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
   font-weight:900;background:#f7f3ed
 }
 
+
+.promoCtaBlock{
+  margin-top:12px;
+  padding:16px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#171717,#0f0f0f);
+  color:#fff;
+  box-shadow:0 10px 26px rgba(0,0,0,.14);
+  border:1px solid #2b2b2b;
+}
+.promoCtaBlock h2,.promoCtaBlock h3,.promoCtaBlock b{color:#fff}
+.promoCtaBlock .ctaTitle{
+  font-size:18px;font-weight:900;margin-bottom:12px;
+}
+.promoCtaGrid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+}
+.promoCtaGrid button{
+  background:#fff;
+  color:#111;
+  border:0;
+  border-radius:13px;
+  padding:13px 10px;
+  font-weight:900;
+  box-shadow:none;
+}
+.promoCtaGrid button:hover{transform:translateY(-1px)}
+.promoCtaGrid button:active{transform:translateY(0)}
+.promoCtaBlock.secondaryCta{
+  background:#fff8ef;
+  color:#3a2b1b;
+  border:1px solid #e1c9a6;
+  box-shadow:0 8px 22px rgba(178,139,87,.12);
+}
+.promoCtaBlock.secondaryCta .ctaTitle{color:#7b5a2f}
+.promoCtaBlock.secondaryCta .promoCtaGrid button{
+  background:#b28b57;
+  color:#fff;
+}
+@media(max-width:900px){
+  .promoCtaGrid{grid-template-columns:1fr 1fr}
+}
+
 .builderContext{
   position:sticky;top:8px;z-index:25;
   display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -216,8 +261,9 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
     <button class="btn promo" data-promo="timeless">Timeless Prodigy</button>
     <button class="btn promo" data-promo="aquatherm">Aquatherm</button>
     <button class="btn promo" data-promo="perfumes">Perfumes</button>
-    <button class="btn promo" data-promo="cabina">Packs cabina 3+1</button>
+    <button class="btn promo" data-promo="cabina">Packs de cabina</button>
   </div>
+</div>
 </div>
 
 <div class="card hidden" id="builderCard">
@@ -274,13 +320,13 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
   <h2>4. Pedidos añadidos</h2>
   <div id="ordersList" class="preview">Todavía no has añadido ninguna promoción.</div>
   <div id="addMoreBlock" class="hidden">
-    <h3>¿Quieres añadir alguna otra familia de pedido?</h3>
+    <h3>¿Quieres añadir alguna otra promoción?</h3>
     <div class="addmore">
       <button onclick="startPromo('power')">+ Power & Premium</button>
       <button onclick="startPromo('timeless')">+ Timeless Prodigy</button>
       <button onclick="startPromo('aquatherm')">+ Aquatherm</button>
       <button onclick="startPromo('perfumes')">+ Perfumes</button>
-      <button onclick="startPromo('cabina')">+ Packs cabina</button>
+      <button onclick="startPromo('cabina')">+ Packs de cabina</button>
     </div>
   </div>
 </div>

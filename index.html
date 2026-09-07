@@ -68,6 +68,19 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 .fpMiniFill.bonus{background:#e8c68d}
 .fpRowValue{font-size:11px;font-weight:900;white-space:nowrap}
 
+
+.builderContext{
+  position:sticky;top:8px;z-index:25;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:-4px 0 14px;padding:12px 14px;border-radius:14px;
+  background:#111;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.16)
+}
+.builderContext small{display:block;opacity:.7;font-size:10px;font-weight:900;letter-spacing:.08em}
+.builderContext strong{display:block;font-size:16px;margin-top:2px}
+.builderContext button{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;border-radius:10px;padding:8px 10px;font-weight:800}
+.builderFlash{animation:builderFlash .8s ease}
+@keyframes builderFlash{0%{box-shadow:0 0 0 5px rgba(178,139,87,.32)}100%{box-shadow:none}}
+
 .amountToggle{
   display:flex;align-items:center;gap:8px;margin-top:12px;
   padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff
@@ -136,12 +149,12 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 </style>
 
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 
 <style>
-#pdfSheet{position:fixed;left:-10000px;top:0;width:800px;background:#fff;color:#171717;padding:38px;font-family:Arial,sans-serif}
+#pdfSheet{position:fixed;left:0;top:0;transform:translateX(-120%);width:800px;background:#fff;color:#171717;padding:38px;font-family:Arial,sans-serif}
 #pdfSheet .pdfHeader{border-bottom:4px solid #b28b57;padding-bottom:18px;margin-bottom:20px}
 #pdfSheet .pdfHeader h1{margin:0;font-size:30px}
 #pdfSheet .pdfSub{color:#6d6256;margin-top:6px}
@@ -198,6 +211,10 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 
 <div class="card hidden" id="builderCard">
   <h2>3. Configurar promoción</h2>
+  <div class="builderContext" id="builderContext">
+    <div><small>ESTÁS CONFIGURANDO</small><strong id="builderContextTitle">Promoción</strong></div>
+    <button type="button" onclick="goOrders()">Ver pedidos añadidos</button>
+  </div>
   <div id="builderTitle" class="preview"></div>
   <h3>Tramo</h3>
   <div class="tiers" id="tiers"></div>
@@ -342,13 +359,16 @@ function startPromo(key,index=null){
  currentPromo=key; currentTier=null; currentQty={}; editingIndex=index;
  document.querySelectorAll(".promo").forEach(x=>x.classList.toggle("active",x.dataset.promo===key));
  $("builderTitle").innerHTML=`<b>${DATA[key].title}</b><br>Selecciona el tramo y configura la composición.`;
+ $("builderContextTitle").textContent=`${DATA[key].title}${orders.length?` · ${orders.length} pedido${orders.length===1?"":"s"} ya añadido${orders.length===1?"":"s"}`:" · primer pedido"}`;
  renderTiers();
  $("builderCard").classList.remove("hidden");
  $("productArea").classList.add("hidden");
  $("showPromoAmount").checked=false;
  $("promoTotal").classList.add("hidden");$("promoTotalHidden").classList.remove("hidden");$("discountLine").classList.add("hidden");
- window.scrollTo({top:$("builderCard").offsetTop-10,behavior:"smooth"});
+ $("builderCard").classList.remove("builderFlash");void $("builderCard").offsetWidth;$("builderCard").classList.add("builderFlash");
+ window.scrollTo({top:$("builderCard").offsetTop-8,behavior:"smooth"});
 }
+function goOrders(){window.scrollTo({top:$("ordersList").closest(".card").offsetTop-10,behavior:"smooth"})}
 function renderTiers(){
  $("tiers").innerHTML="";
  DATA[currentPromo].tiers.forEach((t,i)=>{
@@ -365,8 +385,8 @@ function renderDetail(){
  const t=DATA[currentPromo].tiers[currentTier];let info="";
  if(currentPromo==="power") info=`<b>Power & Premium</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Aquatherm bonificados ${t.aq}</span><span class="badge">Perfumes ${t.perf}</span><span class="badge">Descuento ${t.disc}%</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
  if(currentPromo==="timeless") info=`<b>Timeless Prodigy</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus} The Cream</span><span class="badge">Perfumes ${t.perf}</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
- if(currentPromo==="aquatherm") info=`<b>Aquatherm</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">Bolsas aniversario ${t.b60}</span>`;
- if(currentPromo==="perfumes") info=`<b>Perfumes</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">PVE 23 €</span><span class="badge">PVP 49 €</span>`;
+ if(currentPromo==="aquatherm") info=`<b>Aquatherm</b><br><span class="badge">Selecciona ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">Bolsas aniversario ${t.b60}</span><br>Selecciona el total de cofres y después indica cuáles de ellos van bonificados.`;
+ if(currentPromo==="perfumes") info=`<b>Perfumes</b><br><span class="badge">Selecciona ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">PVE 23 €</span><span class="badge">PVP 49 €</span>`;
  if(currentPromo==="cabina") info=`<b>Packs de cabina</b><br><span class="badge">Selecciona 4</span><span class="badge">Factura 3</span><span class="badge">Bonifica 1</span><br>El comercial elige 4 programas. De los 4, se bonifica automáticamente 1 unidad del programa de menor PVE.`;
  $("logicInfo").innerHTML=info;
 
@@ -384,6 +404,13 @@ function renderDetail(){
    html+=bonusRow("bonSecas","Aquatherm bonificado · normales a secas")+bonusRow("bonGrasas","Aquatherm bonificado · normales a grasas");
    html+=`</div>`;
  }
+ if(currentPromo==="aquatherm"){
+   currentQty.aqBonSecas=0;currentQty.aqBonGrasas=0;
+   html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIÓN · SIN CARGO</div>`;
+   html+=`<h3>De los ${t.buy+t.bonus} cofres seleccionados, indica los ${t.bonus} bonificados</h3>`;
+   html+=bonusRow("aqBonSecas","Aquatherm bonificado · normales a secas")+bonusRow("aqBonGrasas","Aquatherm bonificado · normales a grasas");
+   html+=`</div>`;
+ }
  if(currentPromo==="cabina"){
    html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIÓN · SIN CARGO</div>
    <div class="bonusAuto" id="cabinaBonusAuto">El pack bonificado será automáticamente el de menor PVE entre los packs incluidos en la compra.</div></div>`;
@@ -392,21 +419,38 @@ function renderDetail(){
 }
 function bonusRow(id,name){return `<div class="product"><div><b>${name}</b><small>Sin cargo</small></div><div class="qty"><button onclick="chgBonus('${id}',-1)">−</button><input id="q_${id}" value="0" readonly><button onclick="chgBonus('${id}',1)">+</button></div><div class="money">0,00 €</div></div>`}
 function boughtCount(){return PRODUCTS[currentPromo].reduce((s,[id])=>s+(currentQty[id]||0),0)}
-function chg(id,d){const t=DATA[currentPromo].tiers[currentTier];const max=currentPromo==="cabina"?(t.buy+(t.bonus||0)):t.buy;if(d>0&&boughtCount()>=max)return;currentQty[id]=Math.max(0,(currentQty[id]||0)+d);$("q_"+id).value=currentQty[id];calcCurrent()}
-function chgBonus(id,d){const max=DATA[currentPromo].tiers[currentTier].aq||0;const now=(currentQty.bonSecas||0)+(currentQty.bonGrasas||0);if(d>0&&now>=max)return;currentQty[id]=Math.max(0,(currentQty[id]||0)+d);$("q_"+id).value=currentQty[id];calcCurrent()}
+function chg(id,d){
+ const t=DATA[currentPromo].tiers[currentTier];
+ const max=(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?(t.buy+(t.bonus||0)):t.buy;
+ if(d>0&&boughtCount()>=max)return;currentQty[id]=Math.max(0,(currentQty[id]||0)+d);$("q_"+id).value=currentQty[id];calcCurrent()}
+function chgBonus(id,d){
+ const t=DATA[currentPromo].tiers[currentTier];
+ let max=0,now=0;
+ if(currentPromo==="power"){
+   max=t.aq||0; now=(currentQty.bonSecas||0)+(currentQty.bonGrasas||0);
+ }else if(currentPromo==="aquatherm"){
+   max=t.bonus||0; now=(currentQty.aqBonSecas||0)+(currentQty.aqBonGrasas||0);
+   const selectedId=id==="aqBonSecas"?"aquaSecas":"aquaGrasas";
+   if(d>0 && (currentQty[id]||0)>=(currentQty[selectedId]||0)) return;
+ }
+ if(d>0&&now>=max)return;
+ currentQty[id]=Math.max(0,(currentQty[id]||0)+d);
+ $("q_"+id).value=currentQty[id];calcCurrent()
+}
 
 function financeMax(promo,total){
  if(promo==="timeless"){
-   if(total>=1400)return 4;if(total>=900)return 3;if(total>=600)return 2;return 1;
+   if(total>=1400)return 4;if(total>=900)return 3;if(total>=300)return 2;return 1;
  }
  if(promo==="power"){
-   if(total>=4900)return 10;if(total>=4000)return 9;if(total>=3500)return 8;if(total>=3000)return 7;if(total>=2400)return 6;if(total>=1800)return 4;if(total>=900)return 3;if(total>=600)return 2;return 1;
+   if(total>=4900)return 10;if(total>=4000)return 9;if(total>=3500)return 8;if(total>=3000)return 7;if(total>=2400)return 6;if(total>=1800)return 4;if(total>=900)return 3;if(total>=300)return 2;return 1;
  }
+ if(total>=300)return 2;
  return 1;
 }
 function setPaymentOptions(max){
  const old=parseInt($("payments").value||1);$("payments").innerHTML="";
- for(let i=1;i<=max;i++){let o=document.createElement("option");o.value=i;o.textContent=i===1?"Contado":i+" recibos";$("payments").appendChild(o)}
+ for(let i=1;i<=max;i++){let o=document.createElement("option");o.value=i;o.textContent=i===1?"Contado":(i===2?"2 recibos · 30/60 días":i+" recibos");$("payments").appendChild(o)}
  $("payments").value=Math.min(old,max);
 }
 $("payments").addEventListener("change",calcCurrent);
@@ -443,13 +487,28 @@ function currentTotal(){
    const bi=cabinaBonusInfo();
    return (boughtCount()===target && bi && !bi.pending) ? gross-bi.price : gross;
  }
+ if(currentPromo==="aquatherm"){
+   const bonus=((currentQty.aqBonSecas||0)+(currentQty.aqBonGrasas||0))*30;
+   return Math.max(0,gross-bonus);
+ }
+ if(currentPromo==="perfumes"){
+   return Math.min(boughtCount(),t.buy)*23;
+ }
  const disc=currentPromo==="power"?(t.disc||0):0;
  return gross*(1-disc/100);
 }
 
 function currentValid(){
- const t=DATA[currentPromo].tiers[currentTier];const target=currentPromo==="cabina"?(t.buy+(t.bonus||0)):t.buy;let v=boughtCount()===target;
+ const t=DATA[currentPromo].tiers[currentTier];
+ const target=(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?(t.buy+(t.bonus||0)):t.buy;
+ let v=boughtCount()===target;
  if(currentPromo==="power"&&t.aq>0)v=v&&((currentQty.bonSecas||0)+(currentQty.bonGrasas||0)===t.aq);
+ if(currentPromo==="aquatherm"){
+   const b=(currentQty.aqBonSecas||0)+(currentQty.aqBonGrasas||0);
+   v=v && b===t.bonus &&
+     (currentQty.aqBonSecas||0)<=(currentQty.aquaSecas||0) &&
+     (currentQty.aqBonGrasas||0)<=(currentQty.aquaGrasas||0);
+ }
  return v;
 }
 
@@ -457,17 +516,17 @@ function updateFloatingProgress(){
   if(currentPromo===null||currentTier===null){$("floatingProgress").classList.add("hidden");return}
   const t=DATA[currentPromo].tiers[currentTier];
   const selected=boughtCount();
-  const total=currentPromo==="cabina"?(t.buy+(t.bonus||0)):(t.buy||0);
+  const total=(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?(t.buy+(t.bonus||0)):(t.buy||0);
   const remaining=Math.max(0,total-selected);
   const pct=total?Math.min(100,(selected/total)*100):0;
 
   $("floatingProgress").classList.remove("hidden");
   $("fpFill").style.width=pct+"%";
   $("fpMain").textContent=`${selected} / ${total}`;
-  $("fpRemain").textContent=remaining===0?(currentPromo==="cabina"?"Selección completa ✓":"Facturado completo ✓"):(currentPromo==="cabina"?`Faltan ${remaining} por seleccionar`:`Faltan ${remaining} facturados`);
+  $("fpRemain").textContent=remaining===0?((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?"Selección completa ✓":"Facturado completo ✓"):((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?`Faltan ${remaining} por seleccionar`:`Faltan ${remaining} facturados`);
   $("fpRemain").className="fpRemain "+(remaining===0?"fpOk":"fpWarn");
   $("fpTitle").textContent=DATA[currentPromo].title;
-  $("fpMainLabel").textContent=currentPromo==="cabina"?"SELECCIONADOS":"FACTURADO";
+  $("fpMainLabel").textContent=(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?"SELECCIONADOS":"FACTURADO";
 
   let bonusTotal=0, bonusSelected=0, bonusLabel="";
   if(currentPromo==="power" && (t.aq||0)>0){
@@ -477,9 +536,9 @@ function updateFloatingProgress(){
   }else if(currentPromo==="timeless"){
     bonusTotal=t.bonus||0; bonusSelected=bonusTotal; bonusLabel="Prodigy Cream";
   }else if(currentPromo==="aquatherm"){
-    bonusTotal=t.bonus||0; bonusSelected=bonusTotal; bonusLabel="Aquatherm";
+    bonusTotal=t.bonus||0; bonusSelected=(currentQty.aqBonSecas||0)+(currentQty.aqBonGrasas||0); bonusLabel="Aquatherm";
   }else if(currentPromo==="perfumes"){
-    bonusTotal=t.bonus||0; bonusSelected=bonusTotal; bonusLabel="Perfumes";
+    bonusTotal=t.bonus||0; bonusSelected=boughtCount()===(t.buy+(t.bonus||0))?t.bonus:0; bonusLabel="Perfumes";
   }else if(currentPromo==="cabina"){
     bonusTotal=t.bonus||0; bonusSelected=(boughtCount()===(t.buy+(t.bonus||0))?bonusTotal:0); bonusLabel="Pack cabina";
   }
@@ -508,8 +567,10 @@ function calcCurrent(){
  $("promoTotal").classList.toggle("hidden",!showAmt);
  $("promoTotalHidden").classList.toggle("hidden",showAmt);
  $("discountLine").classList.toggle("hidden",!showAmt);
- let count=boughtCount(),target=currentPromo==="cabina"?(t.buy+(t.bonus||0)):t.buy,txt=`Seleccionados: ${count} de ${target}`;
+ let count=boughtCount(),target=(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?(t.buy+(t.bonus||0)):t.buy,txt=`Seleccionados: ${count} de ${target}`;
  if(currentPromo==="power"&&t.aq>0)txt+=` · Aquatherm bonificados: ${(currentQty.bonSecas||0)+(currentQty.bonGrasas||0)} de ${t.aq}`;
+ if(currentPromo==="aquatherm")txt+=` · Aquatherm bonificados: ${(currentQty.aqBonSecas||0)+(currentQty.aqBonGrasas||0)} de ${t.bonus}`;
+ if(currentPromo==="perfumes")txt+=count===target?` · Perfumes bonificados: ${t.bonus} de ${t.bonus}`:` · Bonificación al completar ${target}`;
  if(currentPromo==="cabina")txt+=count===target?` · Bonificado automático: 1 de 1`:` · Bonificado automático al completar 4`;
  $("validation").className="status "+(currentValid()?"ok":"bad");$("validation").textContent=txt;
  const max=financeMax(currentPromo,total);$("maxPayments").value=max===1?"Contado":max+" recibos";setPaymentOptions(max);
@@ -553,8 +614,12 @@ function orderLines(o){
   lines.push(`Perfumes regalo: ${t.perf}`,`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`,`Descuento: ${t.disc}%`);
  }
  if(p==="timeless")lines.push(`Bonificación The Cream: ${t.bonus}`,`Perfumes regalo: ${t.perf}`,`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`);
- if(p==="aquatherm")lines.push(`Bonificación Aquatherm: ${t.bonus}`,`Bolsas aniversario: ${t.b60}`);
- if(p==="perfumes")lines.push(`Perfumes bonificados: ${t.bonus}`);
+ if(p==="aquatherm"){
+   if(o.qty.aqBonSecas)lines.push(`BONIFICADO · Aquatherm normales a secas: ${o.qty.aqBonSecas}`);
+   if(o.qty.aqBonGrasas)lines.push(`BONIFICADO · Aquatherm normales a grasas: ${o.qty.aqBonGrasas}`);
+   lines.push(`Unidades seleccionadas: ${t.buy+t.bonus} · Facturadas: ${t.buy} · Bonificadas: ${t.bonus}`,`Bolsas aniversario: ${t.b60}`);
+ }
+ if(p==="perfumes")lines.push(`Unidades seleccionadas: ${t.buy+t.bonus} · Facturadas: ${t.buy} · BONIFICADAS: ${t.bonus}`);
  if(p==="cabina"){
    const candidates=[];
    PRODUCTS.cabina.forEach(([id,name,price])=>{if((o.qty[id]||0)>0)candidates.push({id,name,price,qty:o.qty[id]||0})});
@@ -573,7 +638,7 @@ function renderOrders(){
  let html="";
  orders.forEach((o,i)=>{
   const t=DATA[o.promo].tiers[o.tier];
-  html+=`<div class="orderCard"><div class="orderHead"><div><b>${i+1}. ${DATA[o.promo].title}</b><br><span class="badge">Tramo ${t.label||t.buy}</span><span class="badge">${eur(o.total)}</span><span class="badge">${o.payments===1?"Contado":o.payments+" recibos"}</span></div>
+  html+=`<div class="orderCard"><div class="orderHead"><div><b>${i+1}. ${DATA[o.promo].title}</b><br><span class="badge">Tramo ${t.label||t.buy}</span><span class="badge">${o.payments===1?"Contado":(o.payments===2?"2 recibos · 30/60":o.payments+" recibos")}</span></div>
   <div class="orderActions"><button onclick="editOrder(${i})">Editar</button><button onclick="removeOrder(${i})">Eliminar</button></div></div>
   <div class="note" style="margin-top:8px">${orderLines(o).join(" · ")}</div></div>`;
  });
@@ -592,9 +657,9 @@ function renderFinal(){
    const t=DATA[o.promo].tiers[o.tier];
    html+=`<b>PEDIDO ${i+1} — ${DATA[o.promo].title}</b><br>Tramo: ${t.label||t.buy}<br>${orderLines(o).join("<br>")}`;
    if(showAmounts){
-     html+=`<br>Importe: <b>${eur(o.total)}</b><br>Pago: ${o.payments===1?"Contado":o.payments+" recibos de "+eur(o.total/o.payments)}<br><br>`;
+     html+=`<br>Importe: <b>${eur(o.total)}</b><br>Pago: ${o.payments===1?"Contado":(o.payments===2?"2 recibos (30/60 días) de "+eur(o.total/o.payments):o.payments+" recibos de "+eur(o.total/o.payments))}<br><br>`;
    }else{
-     html+=`<br>Forma de pago: ${o.payments===1?"Contado":o.payments+" recibos"}<br><br>`;
+     html+=`<br>Forma de pago: ${o.payments===1?"Contado":(o.payments===2?"2 recibos · 30/60 días":o.payments+" recibos")}<br><br>`;
    }
  });
  if(showAmounts) html+=`<div class="summaryTotal">TOTAL OPERACIÓN: ${eur(total)}</div>`;
@@ -621,7 +686,7 @@ Comercial: ${$("comercial").value||"-"}
 Tramo: ${t.label||t.buy}
 ${orderLines(o).join("\n")}
 Importe: ${eur(o.total)}
-Forma de pago: ${o.payments===1?"Contado":o.payments+" recibos"}
+Forma de pago: ${o.payments===1?"Contado":(o.payments===2?"2 recibos · 30/60 días":o.payments+" recibos")}
 Cuota: ${eur(o.total/o.payments)}
 
 `;
@@ -644,19 +709,19 @@ function buildPdfSheet(){
  const showAmounts=$("showFinalAmount") ? $("showFinalAmount").checked : false;
  const total=orders.reduce((s,o)=>s+o.total,0);
  const sheet=document.createElement("div");sheet.id="pdfSheet";
- let body=`<div class="pdfHeader"><h1>Pedidos Navidad 2026</h1><div class="pdfSub">Herramienta comercial · Hoja de pedido</div></div>
- <div class="pdfMeta"><div><b>Cliente:</b> ${escHtml($("cliente").value||"-")}</div><div><b>Nº cliente:</b> ${escHtml($("numcliente").value||"-")}</div>
+ let body=`<div class="pdfHeader"><div style="font-size:12px;font-weight:900;letter-spacing:.08em;color:#8b6b3f">SKEYNDOR · NAVIDAD 2026</div><h1>Pedido comercial</h1><div class="pdfSub">Resumen visual de promociones seleccionadas</div></div>
+ <div class="pdfMeta"><div><b>Cliente:</b> ${escHtml($("cliente").value||"-")}</div><div><b>Nº cliente:</b> ${escHtml($("numCliente").value||"-")}</div>
  <div><b>Comercial:</b> ${escHtml($("comercial").value||"-")}</div><div><b>Fecha:</b> ${new Date().toLocaleDateString("es-ES")}</div></div>`;
  orders.forEach((o,i)=>{
    const t=DATA[o.promo].tiers[o.tier];
    body+=`<div class="pdfOrder"><h3>${i+1}. ${escHtml(DATA[o.promo].title)} · ${escHtml(t.label||t.buy)}</h3>`;
    const lines=orderLines(o);
    lines.forEach(line=>{
-     const bonus=/bonif/i.test(line);
+     const bonus=/bonif|BONIFICAD/i.test(line);
      body+=`<div class="${bonus?"pdfBonus":"pdfLine"}">${escHtml(line)}</div>`;
    });
-   if(showAmounts) body+=`<div class="pdfLine"><b>Importe:</b> ${eur(o.total)} · <b>Pago:</b> ${o.payments===1?"Contado":o.payments+" recibos de "+eur(o.total/o.payments)}</div>`;
-   else body+=`<div class="pdfLine"><b>Forma de pago:</b> ${o.payments===1?"Contado":o.payments+" recibos"}</div>`;
+   if(showAmounts) body+=`<div class="pdfLine"><b>Importe:</b> ${eur(o.total)} · <b>Pago:</b> ${o.payments===1?"Contado":(o.payments===2?"2 recibos (30/60 días) de "+eur(o.total/o.payments):o.payments+" recibos de "+eur(o.total/o.payments))}</div>`;
+   else body+=`<div class="pdfLine"><b>Forma de pago:</b> ${o.payments===1?"Contado":(o.payments===2?"2 recibos · 30/60 días":o.payments+" recibos")}</div>`;
    body+=`</div>`;
  });
  if(showAmounts) body+=`<div class="pdfTotal">TOTAL: ${eur(total)}</div>`;
@@ -684,7 +749,7 @@ async function makePdfFile(){
    }
    const blob=pdf.output("blob");
    const safe=($("cliente").value||"cliente").replace(/[^\w\-]+/g,"_");
-   const num=($("numcliente").value||"").replace(/[^\w\-]+/g,"_");
+   const num=($("numCliente").value||"").replace(/[^\w\-]+/g,"_");
    const filename=`Pedido_Navidad_2026_${safe}${num?"_"+num:""}.pdf`;
    return new File([blob],filename,{type:"application/pdf"});
  }finally{sheet.remove()}

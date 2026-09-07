@@ -135,6 +135,25 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 #appSplash p{margin:0;opacity:.72;font-size:14px}
 </style>
 
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+
+
+<style>
+#pdfSheet{position:fixed;left:-10000px;top:0;width:800px;background:#fff;color:#171717;padding:38px;font-family:Arial,sans-serif}
+#pdfSheet .pdfHeader{border-bottom:4px solid #b28b57;padding-bottom:18px;margin-bottom:20px}
+#pdfSheet .pdfHeader h1{margin:0;font-size:30px}
+#pdfSheet .pdfSub{color:#6d6256;margin-top:6px}
+#pdfSheet .pdfMeta{display:grid;grid-template-columns:1fr 1fr;gap:10px 30px;margin:18px 0}
+#pdfSheet .pdfOrder{border:1px solid #dfd6c9;border-radius:14px;padding:16px;margin:14px 0}
+#pdfSheet .pdfOrder h3{margin:0 0 10px;font-size:19px}
+#pdfSheet .pdfLine{padding:5px 0;border-bottom:1px solid #f0ece6}
+#pdfSheet .pdfLine:last-child{border-bottom:0}
+#pdfSheet .pdfBonus{margin-top:10px;padding:10px 12px;border-left:5px solid #b28b57;background:#fff8ef;font-weight:700}
+#pdfSheet .pdfTotal{font-size:23px;font-weight:900;text-align:right;margin-top:18px}
+</style>
+
 </head>
 <body>
 
@@ -194,7 +213,7 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
       </div>
       <div class="fpRows">
         <div class="fpRow">
-          <div class="fpRowLabel">FACTURADO</div>
+          <div class="fpRowLabel" id="fpMainLabel">FACTURADO</div>
           <div class="fpMiniBar"><div class="fpMiniFill" id="fpFill"></div></div>
           <div class="fpRowValue" id="fpMain">0 / 0</div>
         </div>
@@ -255,11 +274,10 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
   <label>Observaciones generales</label>
   <textarea id="obs" placeholder="Notas para introducir después en CRM"></textarea>
   <div class="actions">
-    <button class="primary" onclick="sendMail()">Enviar a mi email</button>
-    <button class="secondary" onclick="copySummary()">Copiar resumen</button>
-    <button class="ghost" onclick="window.print()">Guardar / imprimir PDF</button>
+    <button class="primary" onclick="downloadPdf()">Descargar PDF</button>
+    <button class="secondary" onclick="sharePdf()">Compartir PDF</button>
   </div>
-  <div class="note" style="margin-top:10px">“Enviar a mi email” abre la app Mail del iPad con destinatario, asunto y cuerpo ya preparados. El comercial solo tiene que pulsar Enviar.</div>
+  <div class="note" style="margin-top:10px"><b>Descargar PDF</b> guarda una copia del pedido en el dispositivo. <b>Compartir PDF</b> abre el menú Compartir del sistema para guardarlo en Archivos, enviarlo por Mail, AirDrop u otras aplicaciones disponibles.</div>
 </div>
 
 </div>
@@ -349,7 +367,7 @@ function renderDetail(){
  if(currentPromo==="timeless") info=`<b>Timeless Prodigy</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus} The Cream</span><span class="badge">Perfumes ${t.perf}</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
  if(currentPromo==="aquatherm") info=`<b>Aquatherm</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">Bolsas aniversario ${t.b60}</span>`;
  if(currentPromo==="perfumes") info=`<b>Perfumes</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">PVE 23 €</span><span class="badge">PVP 49 €</span>`;
- if(currentPromo==="cabina") info=`<b>Packs de cabina</b><br><span class="badge">Compra 3</span><span class="badge">Bonifica 1</span><br>Mix entre programas profesionales. El bonificado será siempre el de menor PVE entre los 3 seleccionados.`;
+ if(currentPromo==="cabina") info=`<b>Packs de cabina</b><br><span class="badge">Selecciona 4</span><span class="badge">Factura 3</span><span class="badge">Bonifica 1</span><br>El comercial elige 4 programas. De los 4, se bonifica automáticamente 1 unidad del programa de menor PVE.`;
  $("logicInfo").innerHTML=info;
 
  let html="";
@@ -374,7 +392,7 @@ function renderDetail(){
 }
 function bonusRow(id,name){return `<div class="product"><div><b>${name}</b><small>Sin cargo</small></div><div class="qty"><button onclick="chgBonus('${id}',-1)">−</button><input id="q_${id}" value="0" readonly><button onclick="chgBonus('${id}',1)">+</button></div><div class="money">0,00 €</div></div>`}
 function boughtCount(){return PRODUCTS[currentPromo].reduce((s,[id])=>s+(currentQty[id]||0),0)}
-function chg(id,d){const max=DATA[currentPromo].tiers[currentTier].buy;if(d>0&&boughtCount()>=max)return;currentQty[id]=Math.max(0,(currentQty[id]||0)+d);$("q_"+id).value=currentQty[id];calcCurrent()}
+function chg(id,d){const t=DATA[currentPromo].tiers[currentTier];const max=currentPromo==="cabina"?(t.buy+(t.bonus||0)):t.buy;if(d>0&&boughtCount()>=max)return;currentQty[id]=Math.max(0,(currentQty[id]||0)+d);$("q_"+id).value=currentQty[id];calcCurrent()}
 function chgBonus(id,d){const max=DATA[currentPromo].tiers[currentTier].aq||0;const now=(currentQty.bonSecas||0)+(currentQty.bonGrasas||0);if(d>0&&now>=max)return;currentQty[id]=Math.max(0,(currentQty[id]||0)+d);$("q_"+id).value=currentQty[id];calcCurrent()}
 
 function financeMax(promo,total){
@@ -407,20 +425,30 @@ function currentGross(){
 }
 
 function cabinaBonusInfo(qtyObj=currentQty){
- if(currentPromo!=="cabina" && !(qtyObj && ("cabPower" in qtyObj || "cabPremium" in qtyObj))) return null;
  const candidates=[];
  PRODUCTS.cabina.forEach(([id,name,price])=>{
-   if((qtyObj[id]||0)>0) candidates.push({id,name,price});
+   const qty=qtyObj[id]||0;
+   if(qty>0) candidates.push({id,name,price,qty});
  });
  if(!candidates.length) return null;
- const priced=candidates.filter(x=>x.price>0);
+ const priced=candidates.filter(x=>x.price>0).sort((a,b)=>a.price-b.price);
  if(!priced.length) return {name:"Pendiente de precios",price:0,pending:true};
- priced.sort((a,b)=>a.price-b.price);
- return {name:priced[0].name,price:priced[0].price,pending:false};
+ return {id:priced[0].id,name:priced[0].name,price:priced[0].price,pending:false};
+}
+function currentTotal(){
+ const t=DATA[currentPromo].tiers[currentTier];
+ const gross=currentGross();
+ if(currentPromo==="cabina"){
+   const target=t.buy+(t.bonus||0);
+   const bi=cabinaBonusInfo();
+   return (boughtCount()===target && bi && !bi.pending) ? gross-bi.price : gross;
+ }
+ const disc=currentPromo==="power"?(t.disc||0):0;
+ return gross*(1-disc/100);
 }
 
 function currentValid(){
- const t=DATA[currentPromo].tiers[currentTier];let v=boughtCount()===t.buy;
+ const t=DATA[currentPromo].tiers[currentTier];const target=currentPromo==="cabina"?(t.buy+(t.bonus||0)):t.buy;let v=boughtCount()===target;
  if(currentPromo==="power"&&t.aq>0)v=v&&((currentQty.bonSecas||0)+(currentQty.bonGrasas||0)===t.aq);
  return v;
 }
@@ -429,16 +457,17 @@ function updateFloatingProgress(){
   if(currentPromo===null||currentTier===null){$("floatingProgress").classList.add("hidden");return}
   const t=DATA[currentPromo].tiers[currentTier];
   const selected=boughtCount();
-  const total=t.buy||0;
+  const total=currentPromo==="cabina"?(t.buy+(t.bonus||0)):(t.buy||0);
   const remaining=Math.max(0,total-selected);
   const pct=total?Math.min(100,(selected/total)*100):0;
 
   $("floatingProgress").classList.remove("hidden");
   $("fpFill").style.width=pct+"%";
   $("fpMain").textContent=`${selected} / ${total}`;
-  $("fpRemain").textContent=remaining===0?"Facturado completo ✓":`Faltan ${remaining} facturados`;
+  $("fpRemain").textContent=remaining===0?(currentPromo==="cabina"?"Selección completa ✓":"Facturado completo ✓"):(currentPromo==="cabina"?`Faltan ${remaining} por seleccionar`:`Faltan ${remaining} facturados`);
   $("fpRemain").className="fpRemain "+(remaining===0?"fpOk":"fpWarn");
   $("fpTitle").textContent=DATA[currentPromo].title;
+  $("fpMainLabel").textContent=currentPromo==="cabina"?"SELECCIONADOS":"FACTURADO";
 
   let bonusTotal=0, bonusSelected=0, bonusLabel="";
   if(currentPromo==="power" && (t.aq||0)>0){
@@ -452,7 +481,7 @@ function updateFloatingProgress(){
   }else if(currentPromo==="perfumes"){
     bonusTotal=t.bonus||0; bonusSelected=bonusTotal; bonusLabel="Perfumes";
   }else if(currentPromo==="cabina"){
-    bonusTotal=t.bonus||0; bonusSelected=(boughtCount()===t.buy?bonusTotal:0); bonusLabel="Pack cabina";
+    bonusTotal=t.bonus||0; bonusSelected=(boughtCount()===(t.buy+(t.bonus||0))?bonusTotal:0); bonusLabel="Pack cabina";
   }
 
   if(bonusTotal>0){
@@ -471,7 +500,7 @@ function updateFloatingProgress(){
 
 function calcCurrent(){
  if(currentPromo===null||currentTier===null)return;
- const t=DATA[currentPromo].tiers[currentTier];const gross=currentGross();const disc=currentPromo==="power"?(t.disc||0):0;const total=gross*(1-disc/100);
+ const t=DATA[currentPromo].tiers[currentTier];const gross=currentGross();const disc=currentPromo==="power"?(t.disc||0):0;const total=currentTotal();
  PRODUCTS[currentPromo].forEach(([id,,price])=>{let el=$("m_"+id);if(el)el.textContent=eur((currentQty[id]||0)*price)});
  $("promoTotal").textContent=eur(total);
  $("discountLine").textContent=disc?`Antes descuento: ${eur(gross)} · descuento ${disc}%`:"";
@@ -479,8 +508,9 @@ function calcCurrent(){
  $("promoTotal").classList.toggle("hidden",!showAmt);
  $("promoTotalHidden").classList.toggle("hidden",showAmt);
  $("discountLine").classList.toggle("hidden",!showAmt);
- let count=boughtCount(),txt=`Seleccionados: ${count} de ${t.buy}`;
+ let count=boughtCount(),target=currentPromo==="cabina"?(t.buy+(t.bonus||0)):t.buy,txt=`Seleccionados: ${count} de ${target}`;
  if(currentPromo==="power"&&t.aq>0)txt+=` · Aquatherm bonificados: ${(currentQty.bonSecas||0)+(currentQty.bonGrasas||0)} de ${t.aq}`;
+ if(currentPromo==="cabina")txt+=count===target?` · Bonificado automático: 1 de 1`:` · Bonificado automático al completar 4`;
  $("validation").className="status "+(currentValid()?"ok":"bad");$("validation").textContent=txt;
  const max=financeMax(currentPromo,total);$("maxPayments").value=max===1?"Contado":max+" recibos";setPaymentOptions(max);
  const n=parseInt($("payments").value||1);$("monthly").value=eur(total/n);
@@ -488,16 +518,16 @@ function calcCurrent(){
    const bi=cabinaBonusInfo();
    const el=$("cabinaBonusAuto");
    if(el){
-     if(!bi) el.textContent="El pack bonificado será automáticamente el de menor PVE entre los 3 packs seleccionados.";
+     if(!bi) el.textContent="Selecciona 4 programas. Al completar la selección, 1 unidad del programa de menor PVE quedará bonificada automáticamente.";
      else if(bi.pending) el.textContent="Pack bonificado automático: pendiente de cargar los precios de los packs de cabina.";
-     else el.textContent=`Pack bonificado automático: ${bi.name} (${eur(bi.price)}), por ser el de menor PVE de los seleccionados.`;
+     else el.textContent=boughtCount()===(t.buy+(t.bonus||0))?`BONIFICADO: 1 × ${bi.name} (${eur(bi.price)}). Se factura el resto de la selección.`:`Menor PVE seleccionado por ahora: ${bi.name} (${eur(bi.price)}). La bonificación se aplicará al completar 4 unidades.`;
    }
  }
  updateFloatingProgress();
 }
 function addConfiguredOrder(){
  if(!currentValid()){alert("Completa todas las unidades del tramo antes de añadir la promoción.");return}
- const t=DATA[currentPromo].tiers[currentTier];const gross=currentGross();const disc=currentPromo==="power"?(t.disc||0):0;const total=gross*(1-disc/100);const payments=parseInt($("payments").value||1);
+ const t=DATA[currentPromo].tiers[currentTier];const gross=currentGross();const disc=currentPromo==="power"?(t.disc||0):0;const total=currentTotal();const payments=parseInt($("payments").value||1);
  const order={promo:currentPromo,tier:currentTier,qty:JSON.parse(JSON.stringify(currentQty)),gross,disc,total,payments};
  if(editingIndex===null)orders.push(order);else orders[editingIndex]=order;
  cancelBuilder();renderOrders();
@@ -527,10 +557,12 @@ function orderLines(o){
  if(p==="perfumes")lines.push(`Perfumes bonificados: ${t.bonus}`);
  if(p==="cabina"){
    const candidates=[];
-   PRODUCTS.cabina.forEach(([id,name,price])=>{if((o.qty[id]||0)>0)candidates.push({name,price})});
+   PRODUCTS.cabina.forEach(([id,name,price])=>{if((o.qty[id]||0)>0)candidates.push({id,name,price,qty:o.qty[id]||0})});
    const priced=candidates.filter(x=>x.price>0).sort((a,b)=>a.price-b.price);
-   if(priced.length) lines.push(`Pack bonificado: 1 × ${priced[0].name} (menor PVE: ${eur(priced[0].price)})`);
-   else lines.push(`Pack bonificado: 1 × pack de menor PVE (precio pendiente)`);
+   if(priced.length){
+     lines.push(`Bonificado automático: 1 × ${priced[0].name} (menor PVE: ${eur(priced[0].price)})`);
+     lines.push(`Unidades seleccionadas: 4 · Unidades facturadas: 3 · Unidades bonificadas: 1`);
+   }else lines.push(`Pack bonificado: 1 × pack de menor PVE`);
  }
  return lines;
 }
@@ -606,6 +638,89 @@ function sendMail(){
  const subject=`Pedido Navidad 2026 - ${$("cliente").value||"Cliente"}`;
  location.href=`mailto:${encodeURIComponent($("email").value)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullText())}`;
 }
+
+function escHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function buildPdfSheet(){
+ const showAmounts=$("showFinalAmount") ? $("showFinalAmount").checked : false;
+ const total=orders.reduce((s,o)=>s+o.total,0);
+ const sheet=document.createElement("div");sheet.id="pdfSheet";
+ let body=`<div class="pdfHeader"><h1>Pedidos Navidad 2026</h1><div class="pdfSub">Herramienta comercial · Hoja de pedido</div></div>
+ <div class="pdfMeta"><div><b>Cliente:</b> ${escHtml($("cliente").value||"-")}</div><div><b>Nº cliente:</b> ${escHtml($("numcliente").value||"-")}</div>
+ <div><b>Comercial:</b> ${escHtml($("comercial").value||"-")}</div><div><b>Fecha:</b> ${new Date().toLocaleDateString("es-ES")}</div></div>`;
+ orders.forEach((o,i)=>{
+   const t=DATA[o.promo].tiers[o.tier];
+   body+=`<div class="pdfOrder"><h3>${i+1}. ${escHtml(DATA[o.promo].title)} · ${escHtml(t.label||t.buy)}</h3>`;
+   const lines=orderLines(o);
+   lines.forEach(line=>{
+     const bonus=/bonif/i.test(line);
+     body+=`<div class="${bonus?"pdfBonus":"pdfLine"}">${escHtml(line)}</div>`;
+   });
+   if(showAmounts) body+=`<div class="pdfLine"><b>Importe:</b> ${eur(o.total)} · <b>Pago:</b> ${o.payments===1?"Contado":o.payments+" recibos de "+eur(o.total/o.payments)}</div>`;
+   else body+=`<div class="pdfLine"><b>Forma de pago:</b> ${o.payments===1?"Contado":o.payments+" recibos"}</div>`;
+   body+=`</div>`;
+ });
+ if(showAmounts) body+=`<div class="pdfTotal">TOTAL: ${eur(total)}</div>`;
+ if($("obs").value.trim()) body+=`<div class="pdfOrder"><h3>Observaciones</h3><div class="pdfLine">${escHtml($("obs").value)}</div></div>`;
+ sheet.innerHTML=body;document.body.appendChild(sheet);return sheet;
+}
+async function makePdfFile(){
+ if(!orders.length) throw new Error("Añade al menos una promoción.");
+ if(!window.html2canvas || !window.jspdf) throw new Error("No se ha podido cargar el generador PDF. Comprueba la conexión.");
+ const sheet=buildPdfSheet();
+ try{
+   const canvas=await html2canvas(sheet,{scale:2,backgroundColor:"#ffffff"});
+   const {jsPDF}=window.jspdf;
+   const pdf=new jsPDF({orientation:"p",unit:"mm",format:"a4"});
+   const img=canvas.toDataURL("image/jpeg",0.92);
+   const pageW=210, margin=10, usable=pageW-margin*2;
+   const imgH=canvas.height*usable/canvas.width;
+   const pageH=297-margin*2;
+   let y=margin, remaining=imgH;
+   pdf.addImage(img,"JPEG",margin,y,usable,imgH);
+   while(remaining>pageH){
+     remaining-=pageH;
+     pdf.addPage();
+     pdf.addImage(img,"JPEG",margin,margin- (imgH-remaining),usable,imgH);
+   }
+   const blob=pdf.output("blob");
+   const safe=($("cliente").value||"cliente").replace(/[^\w\-]+/g,"_");
+   const num=($("numcliente").value||"").replace(/[^\w\-]+/g,"_");
+   const filename=`Pedido_Navidad_2026_${safe}${num?"_"+num:""}.pdf`;
+   return new File([blob],filename,{type:"application/pdf"});
+ }finally{sheet.remove()}
+}
+async function downloadPdf(){
+ try{
+   const file=await makePdfFile();
+   const url=URL.createObjectURL(file);
+   const a=document.createElement("a");
+   a.href=url;
+   a.download=file.name;
+   document.body.appendChild(a);
+   a.click();
+   a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),2000);
+ }catch(e){
+   alert(e.message||"No se pudo generar el PDF.");
+ }
+}
+
+async function sharePdf(){
+ try{
+   const file=await makePdfFile();
+   if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+     await navigator.share({title:`Pedido Navidad 2026 - ${$("cliente").value||"Cliente"}`,text:"Hoja de pedido Navidad 2026",files:[file]});
+   }else{
+     const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=file.name;a.click();
+     setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+     alert("PDF generado. Se ha descargado para que puedas adjuntarlo al correo.");
+   }
+ }catch(e){
+   if(e && e.name==="AbortError") return;
+   alert(e.message||"No se pudo generar el PDF.");
+ }
+}
+
 async function copySummary(){try{await navigator.clipboard.writeText(fullText());alert("Resumen copiado.")}catch(e){alert("No se pudo copiar automáticamente.")}}
 </script>
 

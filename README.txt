@@ -1,26 +1,11 @@
-# Pedidos Navidad 2026
+Pedidos Navidad 2026 - GitHub Pages v8
 
-Carpeta lista para publicar en Netlify.
+Cambios:
+- Packs cabina 3+1: se seleccionan 4 unidades.
+- Se bonifica automáticamente 1 unidad del programa de menor PVE entre las 4.
+- El importe de cabina se calcula facturando las otras 3.
+- Botón 'Compartir PDF / Mail': genera un PDF visual en el dispositivo y abre Compartir.
+- En iPad puede elegirse Mail para enviar el PDF adjunto.
+- Si compartir archivos no está disponible, el PDF se descarga como alternativa.
 
-## Publicación rápida
-1. Entra en Netlify.
-2. Crea un sitio nuevo usando "Deploy manually" / arrastrar y soltar.
-3. Arrastra esta carpeta completa o el ZIP.
-4. Netlify dará una URL HTTPS.
-
-## iPad
-Abrir la URL en Safari > Compartir > Añadir a pantalla de inicio.
-
-## Surface / Windows
-Abrir la URL en Microsoft Edge o Chrome. También puede instalarse como aplicación/PWA desde el navegador.
-
-## Correo
-El botón "Enviar a mi email" usa `mailto:` y abre la aplicación de correo predeterminada del dispositivo con destinatario, asunto y cuerpo preparados. No adjunta automáticamente PDF.
-
-## Archivos principales
-- index.html
-- manifest.webmanifest
-- sw.js
-- icons/icon-192.png
-- icons/icon-512.png
-- netlify.toml
+Para actualizar GitHub Pages basta sustituir index.html y, si se desea, sw.js.

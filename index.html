@@ -262,14 +262,8 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
         <span>Ver importe del pedido</span>
       </label>
     </div>
-    <h3>Financiación de esta promoción</h3>
-    <div class="paygrid">
-      <div><label>Máximo por importe</label><input id="maxPayments" readonly></div>
-      <div><label>Nº recibos elegido</label><select id="payments"></select></div>
-      <div><label>Importe por recibo</label><input id="monthly" readonly></div>
-    </div>
     <div class="actions">
-      <button class="primary" onclick="addConfiguredOrder()">Añadir esta promoción</button>
+      <button class="primary" onclick="addConfiguredOrder()">Añadir esta promoción al pedido</button>
       <button class="ghost" onclick="cancelBuilder()">Cancelar</button>
       <span></span>
     </div>
@@ -299,6 +293,17 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
     <span>Ver importes en el resumen final</span>
   </label>
   <div id="finalPreview" class="preview"></div>
+
+  <div class="preview" id="globalFinanceBox" style="margin-top:14px">
+    <b>Forma de pago del pedido completo</b>
+    <div class="note" style="margin:4px 0 12px">La financiación se calcula sobre la suma de todas las promociones añadidas.</div>
+    <div class="paygrid">
+      <div><label>Máximo por importe total</label><input id="globalMaxPayments" readonly></div>
+      <div><label>Nº recibos elegido</label><select id="globalPayments"></select></div>
+      <div><label>Importe por recibo</label><input id="globalMonthly" readonly></div>
+    </div>
+  </div>
+
   <label>Observaciones generales</label>
   <textarea id="obs" placeholder="Notas para introducir después en CRM"></textarea>
   <div class="actions">
@@ -441,6 +446,18 @@ function renderDetail(){
  $("products").innerHTML=html;
 }
 function bonusRow(id,name){return `<div class="product"><div><b>${name}</b><small>Sin cargo</small></div><div class="qty"><button onclick="chgBonus('${id}',-1)">−</button><input id="q_${id}" value="0" readonly><button onclick="chgBonus('${id}',1)">+</button></div><div class="money">0,00 €</div></div>`}
+
+function chgBonus(id,d){
+ const t=DATA[currentPromo].tiers[currentTier];
+ if(currentPromo!=="power")return;
+ const max=t.aq||0;
+ const now=(currentQty.bonSecas||0)+(currentQty.bonGrasas||0);
+ if(d>0 && now>=max)return;
+ currentQty[id]=Math.max(0,(currentQty[id]||0)+d);
+ const el=$("q_"+id); if(el) el.value=currentQty[id];
+ calcCurrent();
+}
+
 function boughtCount(){return PRODUCTS[currentPromo].reduce((s,[id])=>s+(currentQty[id]||0),0)}
 function chg(id,d){
  const t=DATA[currentPromo].tiers[currentTier];
@@ -470,18 +487,35 @@ function financeMax(promo,total){
  if(promo==="timeless"){
    if(total>=1400)return 4;if(total>=900)return 3;if(total>=300)return 2;return 1;
  }
- if(promo==="power"){
-   if(total>=4900)return 10;if(total>=4000)return 9;if(total>=3500)return 8;if(total>=3000)return 7;if(total>=2400)return 6;if(total>=1800)return 4;if(total>=900)return 3;if(total>=300)return 2;return 1;
+ if(total>=4900)return 10;if(total>=4000)return 9;if(total>=3500)return 8;if(total>=3000)return 7;if(total>=2400)return 6;if(total>=1800)return 4;if(total>=900)return 3;if(total>=300)return 2;return 1;
+}
+function globalFinanceMax(total){
+ const onlyTimeless=orders.length>0 && orders.every(o=>o.promo==="timeless");
+ let max=financeMax(onlyTimeless?"timeless":"power",total);
+ if(orders.some(o=>o.promo==="power") && orders.some(o=>o.promo==="timeless")) max+=1;
+ return max;
+}
+function setGlobalPaymentOptions(max){
+ const sel=$("globalPayments");
+ const old=parseInt(sel.value||1);
+ sel.innerHTML="";
+ for(let i=1;i<=max;i++){
+   const o=document.createElement("option");o.value=i;
+   o.textContent=i===1?"Contado":(i===2?"2 recibos · 30/60 días":i+" recibos");
+   sel.appendChild(o);
  }
- if(total>=300)return 2;
- return 1;
+ sel.value=String(Math.min(old,max));
 }
-function setPaymentOptions(max){
- const old=parseInt($("payments").value||1);$("payments").innerHTML="";
- for(let i=1;i<=max;i++){let o=document.createElement("option");o.value=i;o.textContent=i===1?"Contado":(i===2?"2 recibos · 30/60 días":i+" recibos");$("payments").appendChild(o)}
- $("payments").value=Math.min(old,max);
+function updateGlobalFinance(){
+ if(!orders.length)return;
+ const total=orders.reduce((s,o)=>s+o.total,0);
+ const max=globalFinanceMax(total);
+ $("globalMaxPayments").value=max===1?"Contado":max+" recibos";
+ setGlobalPaymentOptions(max);
+ const n=parseInt($("globalPayments").value||1);
+ $("globalMonthly").value=eur(total/n);
 }
-$("payments").addEventListener("change",calcCurrent);
+
 
 $("showPromoAmount").addEventListener("change",()=>{
   const show=$("showPromoAmount").checked;
@@ -490,6 +524,7 @@ $("showPromoAmount").addEventListener("change",()=>{
   $("discountLine").classList.toggle("hidden",!show);
 });
 $("showFinalAmount").addEventListener("change",renderFinal);
+$("globalPayments").addEventListener("change",()=>{updateGlobalFinance();renderFinal();});
 
 
 function currentGross(){
@@ -599,8 +634,6 @@ function calcCurrent(){
  if(currentPromo==="perfumes")txt+=` · Pedido cerrado ${t.label} ✓`;
  if(currentPromo==="cabina")txt+=count===target?` · Bonificados automáticos: ${t.bonus} de ${t.bonus}`:` · Bonificación automática al completar ${target}`;
  $("validation").className="status "+(currentValid()?"ok":"bad");$("validation").textContent=txt;
- const max=financeMax(currentPromo,total);$("maxPayments").value=max===1?"Contado":max+" recibos";setPaymentOptions(max);
- const n=parseInt($("payments").value||1);$("monthly").value=eur(total/n);
  if(currentPromo==="cabina"){
    const bi=cabinaBonusInfo(currentQty,t.bonus);
    const el=$("cabinaBonusAuto");
@@ -617,8 +650,8 @@ function calcCurrent(){
 }
 function addConfiguredOrder(){
  if(!currentValid()){alert("Completa todas las unidades del tramo antes de añadir la promoción.");return}
- const t=DATA[currentPromo].tiers[currentTier];const gross=currentGross();const disc=currentPromo==="power"?(t.disc||0):0;const total=currentTotal();const payments=parseInt($("payments").value||1);
- const order={promo:currentPromo,tier:currentTier,qty:JSON.parse(JSON.stringify(currentQty)),gross,disc,total,payments};
+ const t=DATA[currentPromo].tiers[currentTier];const gross=currentGross();const disc=currentPromo==="power"?(t.disc||0):0;const total=currentTotal();
+ const order={promo:currentPromo,tier:currentTier,qty:JSON.parse(JSON.stringify(currentQty)),gross,disc,total};
  if(editingIndex===null)orders.push(order);else orders[editingIndex]=order;
  cancelBuilder();renderOrders();
 }
@@ -633,7 +666,7 @@ function editOrder(i){
  renderDetail();
  currentQty=saved;
  Object.keys(currentQty).forEach(id=>{let el=$("q_"+id);if(el)el.value=currentQty[id]});
- $("productArea").classList.remove("hidden");calcCurrent();$("payments").value=o.payments;calcCurrent();
+ $("productArea").classList.remove("hidden");calcCurrent();
 }
 
 
@@ -688,13 +721,13 @@ function renderOrders(){
  let html="";
  orders.forEach((o,i)=>{
   const t=DATA[o.promo].tiers[o.tier];
-  html+=`<div class="orderCard"><div class="orderHead"><div><b>${i+1}. ${DATA[o.promo].title}</b><br><span class="badge">Tramo ${t.label||t.buy}</span><span class="badge">${o.payments===1?"Contado":(o.payments===2?"2 recibos · 30/60":o.payments+" recibos")}</span></div>
+  html+=`<div class="orderCard"><div class="orderHead"><div><b>${i+1}. ${DATA[o.promo].title}</b><br><span class="badge">Tramo ${t.label||t.buy}</span></div>
   <div class="orderActions"><button onclick="editOrder(${i})">Editar</button><button onclick="removeOrder(${i})">Eliminar</button></div></div>
   <div class="note" style="margin-top:8px">${orderLines(o).join(" · ")}</div></div>`;
  });
  $("ordersList").innerHTML=html;$("addMoreBlock").classList.remove("hidden");$("finalCard").classList.remove("hidden");
  if(!$("showFinalAmount").dataset.touched){$("showFinalAmount").checked=false;$("showFinalAmount").dataset.touched="1";}
- renderFinal();
+ updateGlobalFinance();renderFinal();
 }
 function combinedExtraMonth(){
  return orders.some(o=>o.promo==="power")&&orders.some(o=>o.promo==="timeless");
@@ -702,32 +735,35 @@ function combinedExtraMonth(){
 function renderFinal(){
  const total=orders.reduce((s,o)=>s+o.total,0);
  const showAmounts=$("showFinalAmount") ? $("showFinalAmount").checked : false;
+ const gp=parseInt($("globalPayments")?.value||1);
  let html="";
  orders.forEach((o,i)=>{
    const t=DATA[o.promo].tiers[o.tier];
    html+=`<b>PEDIDO ${i+1} — ${DATA[o.promo].title}</b><br>Tramo: ${t.label||t.buy}<br>${orderLines(o).join("<br>")}`;
-   if(showAmounts){
-     html+=`<br>Importe: <b>${eur(o.total)}</b><br>Pago: ${o.payments===1?"Contado":(o.payments===2?"2 recibos (30/60 días) de "+eur(o.total/o.payments):o.payments+" recibos de "+eur(o.total/o.payments))}<br><br>`;
-   }else{
-     html+=`<br>Forma de pago: ${o.payments===1?"Contado":(o.payments===2?"2 recibos · 30/60 días":o.payments+" recibos")}<br><br>`;
-   }
+   if(showAmounts) html+=`<br>Importe promoción: <b>${eur(o.total)}</b><br><br>`;
+   else html+=`<br><br>`;
  });
  if(showAmounts) html+=`<div class="summaryTotal">TOTAL OPERACIÓN: ${eur(total)}</div>`;
  else html+=`<div class="summaryTotal">TOTAL OPERACIÓN: oculto</div>`;
+ html+=`<div style="margin-top:10px"><b>Forma de pago del pedido completo:</b> ${gp===1?"Contado":(gp===2?"2 recibos a 30/60 días":gp+" recibos")}`;
+ if(showAmounts && gp>1) html+=` · ${eur(total/gp)} por recibo`;
+ html+=`</div>`;
  $("finalPreview").innerHTML=html;
  if(combinedExtraMonth()){
    $("combinedNote").classList.remove("hidden");
-   $("combinedNote").textContent="Power/Premium + Timeless Prodigy: según la condición de financiación aportada, dispone de 1 mes adicional de pago.";
+   $("combinedNote").textContent="Power/Premium + Timeless Prodigy: se ha añadido 1 recibo adicional al máximo de financiación del pedido completo.";
  }else $("combinedNote").classList.add("hidden");
 }
 $("obs").addEventListener("input",renderFinal);
 
 function fullText(){
- const total=orders.reduce((s,o)=>s+o.total,0);let s=`PEDIDO NAVIDAD 2026
+ const total=orders.reduce((s,o)=>s+o.total,0);
+ const gp=parseInt($("globalPayments")?.value||1);
+ let s=`PEDIDO NAVIDAD 2026
 
-Cliente: ${$("cliente").value||"-"}
-Nº cliente: ${$("numCliente").value||"-"}
-Comercial: ${$("comercial").value||"-"}
+Cliente: ${fieldValue("cliente")||"-"}
+Nº cliente: ${fieldValue("numCliente")||"-"}
+Comercial: ${fieldValue("comercial")||"-"}
 
 `;
  orders.forEach((o,i)=>{
@@ -736,15 +772,15 @@ Comercial: ${$("comercial").value||"-"}
 Tramo: ${t.label||t.buy}
 ${orderLines(o).join("\n")}
 Importe: ${eur(o.total)}
-Forma de pago: ${o.payments===1?"Contado":(o.payments===2?"2 recibos · 30/60 días":o.payments+" recibos")}
-Cuota: ${eur(o.total/o.payments)}
 
 `;
  });
  s+=`TOTAL OPERACIÓN: ${eur(total)}
+FORMA DE PAGO GLOBAL: ${gp===1?"Contado":(gp===2?"2 recibos a 30/60 días":gp+" recibos")}
+${gp>1?"CUOTA: "+eur(total/gp):""}
+
+Observaciones generales: ${fieldValue("obs")||"-"}
 `;
- if(combinedExtraMonth())s+=`\nNOTA FINANCIACIÓN: Power/Premium + Timeless Prodigy dispone de 1 mes adicional de pago.\n`;
- s+=`\nObservaciones generales: ${$("obs").value||"-"}\n\nRecordatorio comercial para posterior introducción en CRM.`;
  return s;
 }
 function sendMail(){
@@ -762,16 +798,11 @@ function fieldValue(id){
 
 function escHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
 
-function pdfPaymentText(o,showAmounts){
-  if(o.payments===1) return "Contado";
-  if(o.payments===2){
-    return showAmounts
-      ? `2 recibos a 30/60 días de ${eur(o.total/o.payments)}`
-      : "2 recibos a 30/60 días";
-  }
-  return showAmounts
-    ? `${o.payments} recibos de ${eur(o.total/o.payments)}`
-    : `${o.payments} recibos`;
+function pdfGlobalPaymentText(total,showAmounts){
+  const n=parseInt($("globalPayments")?.value||1);
+  if(n===1)return "Contado";
+  if(n===2)return showAmounts?`2 recibos a 30/60 días de ${eur(total/2)}`:"2 recibos a 30/60 días";
+  return showAmounts?`${n} recibos de ${eur(total/n)}`:`${n} recibos`;
 }
 
 async function makePdfFile(){
@@ -889,9 +920,6 @@ async function makePdfFile(){
     });
 
     ensure(10);
-    const pay=pdfPaymentText(o,showAmounts);
-    lineBox("Forma de pago",pay,y,false);
-    y+=7.5;
     if(showAmounts){
       lineBox("Importe promoción",eur(o.total),y,false);
       y+=7.5;
@@ -912,6 +940,15 @@ async function makePdfFile(){
   pdf.text(totalTxt,margin+7,y+(showAmounts?10:8));
   pdf.setTextColor(20,20,20);
   y+=showAmounts?22:18;
+
+  ensure(14);
+  pdf.setDrawColor(224,214,199);
+  pdf.roundedRect(margin,y,contentW,12,3,3,"S");
+  pdf.setFont("helvetica","bold");pdf.setFontSize(9.5);
+  pdf.text("FORMA DE PAGO DEL PEDIDO COMPLETO",margin+6,y+5);
+  pdf.setFont("helvetica","normal");
+  pdf.text(pdfGlobalPaymentText(total,showAmounts),margin+6,y+9.5);
+  y+=18;
 
   const obs=fieldValue("obs").trim();
   if(obs){

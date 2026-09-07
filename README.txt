@@ -1,9 +1,9 @@
-Pedidos Navidad 2026 · v12
+Pedidos Navidad 2026 · v13
 
-Corrección crítica PDF:
-- Eliminada la captura HTML (html2canvas).
-- El PDF se dibuja directamente con jsPDF con diseño visual de tarjetas.
-- Lectura defensiva de campos para evitar errores 'Cannot read properties of null (reading value)'.
-- Descargar PDF y Compartir PDF usan el mismo documento visual.
-- Compartir cae automáticamente a descarga si el navegador no permite compartir archivos.
-- Service worker actualizado a red primero para evitar versiones antiguas en caché.
+Cambios:
+- Corregido selector de Aquatherm bonificado en Power & Premium.
+- Eliminada la forma de pago de cada promoción individual.
+- La forma de pago se elige una sola vez al final, sobre el total de todas las promociones.
+- Escala de financiación aplicada al total global; desde 300 € se habilitan 2 recibos a 30/60 días.
+- Si el pedido combina Power/Premium + Timeless Prodigy, se añade 1 recibo al máximo global.
+- Resumen final y PDF muestran una única forma de pago global.

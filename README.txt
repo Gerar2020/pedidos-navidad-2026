@@ -1,10 +1,9 @@
-Pedidos Navidad 2026 · v10
+Pedidos Navidad 2026 · v12
 
-Correcciones incluidas:
-- Financiación desde 300 €: opción de 2 recibos a 30/60 días.
-- Packs cabina 3+1: seleccionar 4, facturar 3, bonificar automáticamente el de menor PVE.
-- Aquatherm 9+1 / 12+3: seleccionar 10 / 15 unidades totales y marcar los cofres bonificados.
-- Perfumes 10+1 / 18+2: seleccionar 11 / 20 unidades totales.
-- Navegación: barra 'Estás configurando...' al añadir nuevas promociones.
-- PDF: corregido error por identificador de Nº cliente y salida visual.
-- Botones finales: Descargar PDF y Compartir PDF.
+Corrección crítica PDF:
+- Eliminada la captura HTML (html2canvas).
+- El PDF se dibuja directamente con jsPDF con diseño visual de tarjetas.
+- Lectura defensiva de campos para evitar errores 'Cannot read properties of null (reading value)'.
+- Descargar PDF y Compartir PDF usan el mismo documento visual.
+- Compartir cae automáticamente a descarga si el navegador no permite compartir archivos.
+- Service worker actualizado a red primero para evitar versiones antiguas en caché.

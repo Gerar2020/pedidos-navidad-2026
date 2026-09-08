@@ -275,6 +275,97 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
   font-weight:700;
 }
 
+
+/* v25: asistente flotante de upgrade más comercial y siempre visible */
+.floatingProgress{
+  position:fixed!important;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:12px!important;
+  width:min(760px,calc(100% - 18px));
+  z-index:9999!important;
+  padding:12px 14px!important;
+  border-radius:18px!important;
+  background:rgba(20,20,20,.97)!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 14px 40px rgba(0,0,0,.30)!important;
+  border:1px solid rgba(255,255,255,.08);
+}
+.fpUpgradeHeader{
+  display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:8px
+}
+.fpUpgradeLeft{min-width:0}
+.fpUpgradeBrand{font-size:12px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fpUpgradeGoal{font-size:15px;font-weight:900;color:#f5d09a;text-align:right;line-height:1.12}
+.fpUpgradeGains{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  margin-top:8px;
+}
+.fpGain{
+  background:#2a2a2a;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;
+  padding:7px 6px;
+  text-align:center;
+}
+.fpGain .n{
+  display:block;
+  color:#f4d39f;
+  font-size:17px;
+  font-weight:900;
+  line-height:1;
+}
+.fpGain .t{
+  display:block;
+  color:#fff;
+  opacity:.9;
+  font-size:9px;
+  font-weight:800;
+  margin-top:3px;
+  line-height:1.08;
+}
+.fpUpgradeCta{
+  margin-top:8px;
+  padding:8px 10px;
+  border-radius:10px;
+  background:#7b5a2f;
+  color:#fff;
+  font-size:12px;
+  font-weight:900;
+  text-align:center;
+}
+.fpUpgradeCta.near{
+  background:#b28b57;
+  color:#111;
+}
+.fpUpgradeMeta{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px
+}
+.fpUpgradeMeta span{
+  color:#fff;font-size:10px;font-weight:800;opacity:.9
+}
+.fpMiniBar{
+  height:7px;background:#4a4a4a;border-radius:999px;overflow:hidden;flex:1
+}
+.fpMiniBarFill{
+  height:100%;background:#fff;border-radius:999px
+}
+@media(max-width:560px){
+  .floatingProgress{width:calc(100% - 12px);bottom:8px!important;padding:10px 11px!important}
+  .fpUpgradeHeader{gap:8px}
+  .fpUpgradeBrand{font-size:11px}
+  .fpUpgradeGoal{font-size:13px}
+  .fpUpgradeGains{grid-template-columns:repeat(3,1fr);gap:5px}
+  .fpGain{padding:6px 4px}
+  .fpGain .n{font-size:15px}
+  .fpGain .t{font-size:8px}
+  .fpUpgradeCta{font-size:11px;padding:7px 8px}
+}
+body{padding-bottom:190px!important}
+
 .floatingProgress{
   position:sticky;
   bottom:12px;
@@ -398,10 +489,7 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
     <div id="logicInfo" class="preview"></div>
     <div id="products"></div>
     <div id="validation"></div>
-    <div id="floatingProgress" class="floatingProgress hidden">
-      <div class="fpTop">
-        <div class="fpTitle" id="fpTitle">Progreso del pedido</div>
-        <div class="fpRemain" id="fpRemain">Faltan 0</div>
+    <div id="floatingProgress" class="floatingProgress hidden"><div id="fpUpgradeMount"></div></div>
       </div>
       <div class="fpRows">
         <div class="fpRow">
@@ -613,6 +701,143 @@ function powerUpgradeGain(current,next){
     tester:(current.buy<=10 && next.buy>10)?1:0
   };
 }
+
+function upgradeGainItemsPower(current,next){
+  const g=powerUpgradeGain(current,next), arr=[];
+  if(g.aq>0)arr.push({n:`+${g.aq}`,t:"Aquatherm"});
+  if(g.perf>0)arr.push({n:`+${g.perf}`,t:"fragancias"});
+  if(g.disc>0)arr.push({n:`+${g.disc}%`,t:"descuento"});
+  if(g.tester>0)arr.push({n:"+1",t:"tester"});
+  return arr;
+}
+function upgradeGainItemsTimeless(current,next){
+  const g=timelessUpgradeGain(current,next), arr=[];
+  if(g.bonus>0)arr.push({n:`+${g.bonus}`,t:"The Cream"});
+  if(g.perf>0)arr.push({n:`+${g.perf}`,t:"fragancias"});
+  if(g.b60>0)arr.push({n:`+${g.b60}`,t:"bolsas 60"});
+  if(g.bex>0)arr.push({n:`+${g.bex}`,t:"bolsas exclusivas"});
+  if(g.kit>0)arr.push({n:`+${g.kit}`,t:"kit"});
+  return arr;
+}
+function renderFloatingUpgradeHUD(){
+  const wrap=$("floatingProgress");
+  if(!wrap || currentPromo===null || currentTier===null){ if(wrap)wrap.classList.add("hidden"); return; }
+  wrap.classList.remove("hidden");
+
+  let mount=$("fpUpgradeMount");
+  if(!mount){
+    wrap.innerHTML='<div id="fpUpgradeMount"></div>';
+    mount=$("fpUpgradeMount");
+  }
+
+  const count=boughtCount();
+
+  if(currentPromo==="power"){
+    syncPowerTier();
+    const current=DATA.power.tiers[currentTier];
+    const nextIdx=powerNextTierIndex(count);
+    const next=nextIdx===null?null:DATA.power.tiers[nextIdx];
+    const target=count<10?10:(next?next.buy:90);
+    const remaining=Math.max(0,target-count);
+    const prev=count<10?0:current.buy;
+    const span=Math.max(1,target-prev);
+    const pct=Math.max(0,Math.min(100,(count-prev)/span*100));
+
+    let items=[];
+    if(count<10){
+      const first=DATA.power.tiers[0];
+      items=[];
+      if(first.perf>0)items.push({n:`+${first.perf}`,t:"fragancias"});
+      if(first.aq>0)items.push({n:`+${first.aq}`,t:"Aquatherm"});
+      if(first.disc>0)items.push({n:`+${first.disc}%`,t:"descuento"});
+    }else if(next){
+      items=upgradeGainItemsPower(current,next);
+    }
+    const gains=items.slice(0,3).map(x=>`<div class="fpGain"><span class="n">${x.n}</span><span class="t">${x.t}</span></div>`).join("");
+    const goal=next||count<10?`Faltan ${remaining} para ${target}`:"Máximo alcanzado";
+    const cta=count>=90
+      ?"Has alcanzado el máximo nivel de campaña."
+      :count<10
+        ?`Añade ${remaining} cofre${remaining===1?"":"s"} y desbloqueas tu primera promoción.`
+        :`Si añades ${remaining} cofre${remaining===1?"":"s"} más, mejoras las condiciones del pedido.`;
+
+    mount.innerHTML=`
+      <div class="fpUpgradeHeader">
+        <div class="fpUpgradeLeft"><div class="fpUpgradeBrand">Power & Premium · ${count} cofres</div></div>
+        <div class="fpUpgradeGoal">${goal}</div>
+      </div>
+      ${gains?`<div class="fpUpgradeGains">${gains}</div>`:""}
+      <div class="fpUpgradeCta ${remaining<=6&&remaining>0?"near":""}">${cta}</div>
+      <div class="fpUpgradeMeta">
+        <span>Tramo actual: ${count>=10?current.buy:"—"}</span>
+        <div class="fpMiniBar"><div class="fpMiniBarFill" style="width:${pct}%"></div></div>
+        <span>${count}/${target}</span>
+      </div>`;
+    return;
+  }
+
+  if(currentPromo==="timeless"){
+    syncTimelessTier();
+    const current=DATA.timeless.tiers[currentTier];
+    const nextIdx=timelessNextTierIndex(count);
+    const next=nextIdx===null?null:DATA.timeless.tiers[nextIdx];
+    const target=count<8?8:(next?next.buy:24);
+    const remaining=Math.max(0,target-count);
+    const prev=count<8?0:current.buy;
+    const span=Math.max(1,target-prev);
+    const pct=Math.max(0,Math.min(100,(count-prev)/span*100));
+
+    let items=[];
+    if(count<8){
+      const first=DATA.timeless.tiers[0];
+      items=[
+        {n:`+${first.bonus}`,t:"The Cream"},
+        {n:`+${first.perf}`,t:"fragancias"},
+        {n:"+1",t:"tester"}
+      ];
+    }else if(next){
+      items=upgradeGainItemsTimeless(current,next);
+    }
+    const gains=items.slice(0,3).map(x=>`<div class="fpGain"><span class="n">${x.n}</span><span class="t">${x.t}</span></div>`).join("");
+    const goal=next||count<8?`Faltan ${remaining} para ${target}`:"Máximo alcanzado";
+    const cta=count>=24
+      ?"Has alcanzado el máximo nivel de Timeless Prodigy."
+      :count<8
+        ?`Añade ${remaining} cofre${remaining===1?"":"s"} y desbloqueas el tramo 8.`
+        :`Si añades ${remaining} cofre${remaining===1?"":"s"} más, aumentas las bonificaciones.`;
+
+    mount.innerHTML=`
+      <div class="fpUpgradeHeader">
+        <div class="fpUpgradeLeft"><div class="fpUpgradeBrand">Timeless Prodigy · ${count} cofres</div></div>
+        <div class="fpUpgradeGoal">${goal}</div>
+      </div>
+      ${gains?`<div class="fpUpgradeGains">${gains}</div>`:""}
+      <div class="fpUpgradeCta ${remaining<=4&&remaining>0?"near":""}">${cta}</div>
+      <div class="fpUpgradeMeta">
+        <span>Tramo actual: ${count>=8?current.buy:"—"}</span>
+        <div class="fpMiniBar"><div class="fpMiniBarFill" style="width:${pct}%"></div></div>
+        <span>${count}/${target}</span>
+      </div>`;
+    return;
+  }
+
+  // Other promo families retain a compact standard progress display
+  const t=DATA[currentPromo].tiers[currentTier];
+  let total=t.buy||0;
+  if(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes") total=t.buy+(t.bonus||0);
+  const remaining=Math.max(0,total-count);
+  const pct=Math.min(100,total?count/total*100:0);
+  mount.innerHTML=`
+    <div class="fpUpgradeHeader">
+      <div class="fpUpgradeLeft"><div class="fpUpgradeBrand">${DATA[currentPromo].title}</div></div>
+      <div class="fpUpgradeGoal">${remaining?`Faltan ${remaining}`:"Completo ✓"}</div>
+    </div>
+    <div class="fpUpgradeMeta">
+      <span>Seleccionados</span>
+      <div class="fpMiniBar"><div class="fpMiniBarFill" style="width:${pct}%"></div></div>
+      <span>${count}/${total}</span>
+    </div>`;
+}
 function powerGainCards(g){
   const items=[];
   if(g.aq>0)items.push(`<div class="upgradeGainItem"><span class="num">+${g.aq}</span><span class="lbl">Aquatherm de regalo</span></div>`);
@@ -727,7 +952,7 @@ function renderDetail(){
    currentQty.bonSecas=0;currentQty.bonGrasas=0;
    html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIONES · SIN CARGO</div>
    <div class="bonusSummary">
-     <div class="bonusSummaryTitle">Todo lo que incluye gratis este tramo</div>
+     <div class="bonusSummaryTitle">BONIFICACIONES ACTUALES · todo lo que se lleva gratis este tramo</div>
      <div class="bonusSummaryGrid">
        <div class="bonusSummaryItem" id="bonusAqCard"><span class="big" id="bonusAqQty">0</span><span class="small">Aquatherm bonificados</span></div>
        <div class="bonusSummaryItem" id="bonusPerfCard"><span class="big" id="bonusPerfQty">0</span><span class="small">fragancias de regalo</span></div>
@@ -913,87 +1138,7 @@ function updateTimelessUpgrade(){
  <div class="upgradeHeadline ${left<=2?"near":""}">Añade ${left} cofre${left===1?"":"s"} y desbloqueas el tramo 8.</div>`;
 }
 
-function updateFloatingProgress(){
-  if(currentPromo===null||currentTier===null){$("floatingProgress").classList.add("hidden");return}
-  if(currentPromo==="power")syncPowerTier();
- if(currentPromo==="timeless")syncTimelessTier();
-  const t=DATA[currentPromo].tiers[currentTier];
-  const selected=boughtCount();
-  let total=(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?(t.buy+t.bonus):t.buy;
-  if(currentPromo==="power"){
-    const ni=powerNextTierIndex(selected);
-    total=selected<10?10:(ni===null?90:DATA.power.tiers[ni].buy);
-  }
-  if(currentPromo==="timeless"){
-    const ni=timelessNextTierIndex(selected);
-    total=selected<8?8:(ni===null?24:DATA.timeless.tiers[ni].buy);
-  }
-  const remaining=Math.max(0,total-selected);
-  const pct=total?Math.min(100,(selected/total)*100):0;
-
-  $("floatingProgress").classList.remove("hidden");
-  $("fpFill").style.width=pct+"%";
-  $("fpMain").textContent=`${selected} / ${total}`;
-  $("fpRemain").textContent=currentPromo==="power"
-    ?(selected>=90?"Máximo alcanzado ✓":`Faltan ${remaining} para siguiente tramo`)
-    :currentPromo==="timeless"
-      ?(selected>=24?"Máximo alcanzado ✓":`Faltan ${remaining} para siguiente tramo`)
-      :(remaining===0?((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?"Selección completa ✓":"Facturado completo ✓"):((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?`Faltan ${remaining} por seleccionar`:`Faltan ${remaining} facturados`));
-  $("fpRemain").className="fpRemain "+(remaining===0?"fpOk":"fpWarn");
-  $("fpTitle").textContent=DATA[currentPromo].title;
-  $("fpMainLabel").textContent=(currentPromo==="power"||currentPromo==="timeless")?"COFRES":((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?"SELECCIONADOS":"FACTURADO");
-
-  let bonusTotal=0, bonusSelected=0, bonusLabel="";
-  if(currentPromo==="power" && (t.aq||0)>0){
-    bonusTotal=t.aq;
-    bonusSelected=(currentQty.bonSecas||0)+(currentQty.bonGrasas||0);
-    bonusLabel="Aquatherm";
-  }else if(currentPromo==="timeless"){
-    bonusTotal=t.bonus||0; bonusSelected=bonusTotal; bonusLabel="Prodigy Cream";
-  }else if(currentPromo==="aquatherm"){
-    bonusTotal=t.bonus||0; bonusSelected=t.bonus||0; bonusLabel="Aquatherm";
-  }else if(currentPromo==="perfumes"){
-    bonusTotal=t.bonus||0; bonusSelected=t.bonus||0; bonusLabel="Perfumes";
-  }else if(currentPromo==="cabina"){
-    bonusTotal=t.bonus||0; bonusSelected=(boughtCount()===(t.buy+t.bonus)?bonusTotal:0); bonusLabel="Pack cabina";
-  }
-
-  
-  if(currentPromo==="power" && selected>=10 && selected<90){
-    const ni=powerNextTierIndex(selected);
-    if(ni!==null){
-      const cur=DATA.power.tiers[currentTier], nxt=DATA.power.tiers[ni], g=powerUpgradeGain(cur,nxt), gains=[];
-      if(g.aq>0)gains.push(`+${g.aq} Aquatherm`);
-      if(g.perf>0)gains.push(`+${g.perf} fragancias`);
-      if(g.disc>0)gains.push(`+${g.disc}% dto.`);
-      if(g.tester>0)gains.push(`+1 tester`);
-      $("fpTitle").textContent=`Power & Premium · al subir: ${gains.join(" · ")}`;
-    }
-  }else if(currentPromo==="timeless" && selected>=8 && selected<24){
-    const ni=timelessNextTierIndex(selected);
-    if(ni!==null){
-      const cur=DATA.timeless.tiers[currentTier], nxt=DATA.timeless.tiers[ni], g=timelessUpgradeGain(cur,nxt), gains=[];
-      if(g.bonus>0)gains.push(`+${g.bonus} The Cream`);
-      if(g.perf>0)gains.push(`+${g.perf} fragancias`);
-      if(g.b60>0)gains.push(`+${g.b60} bolsas 60`);
-      if(g.bex>0)gains.push(`+${g.bex} bolsas excl.`);
-      if(g.kit>0)gains.push(`+${g.kit} kit`);
-      $("fpTitle").textContent=`Timeless · al subir: ${gains.join(" · ")}`;
-    }
-  }
-if(bonusTotal>0){
-    $("fpBonusRow").classList.remove("hidden");
-    const bpct=Math.min(100,(bonusSelected/bonusTotal)*100);
-    $("fpBonusFill").style.width=bpct+"%";
-    const brem=Math.max(0,bonusTotal-bonusSelected);
-    $("fpBonus").textContent=brem===0?`${bonusLabel}: ${bonusSelected}/${bonusTotal} ✓`:`${bonusLabel}: ${bonusSelected}/${bonusTotal} · faltan ${brem}`;
-    $("fpBonus").className="fpRowValue "+(brem===0?"fpOk":"fpWarn");
-  }else{
-    $("fpBonusRow").classList.add("hidden");
-    $("fpBonusFill").style.width="0%";
-    $("fpBonus").textContent="";
-  }
-}
+function updateFloatingProgress(){ renderFloatingUpgradeHUD(); }
 
 function calcCurrent(){
  if(currentPromo===null||currentTier===null)return;

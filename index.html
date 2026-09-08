@@ -70,6 +70,10 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 
 
 
+
+.productMeta{display:block;margin-top:3px;font-size:11px;color:#766b60;line-height:1.35}
+.productCode{font-weight:800;color:#5f554b}
+
 .closedOrder{
   padding:14px 16px;border-radius:14px;background:#f7f2e9;border:1px solid #e6d9c5;margin-bottom:12px
 }
@@ -378,34 +382,60 @@ const DATA={
 
 const PRODUCTS={
  power:[
-  ["correctiveCrema","Corrective · Crema",76],["correctiveEmulsion","Corrective · Emulsión",76],
-  ["globalSecas","Global Lift · Pieles secas",73],["globalMixtas","Global Lift · Pieles mixtas",73],
-  ["eternalCrema","Eternal · Crema",67],["eternalRica","Eternal · Crema rica",67],
-  ["phCrema","Power Hyaluronic · Crema",50],["phEmulsion","Power Hyaluronic · Emulsión",50],
-  ["pcCrema","Power C+ · Crema",53],["pcEmulsion","Power C+ · Emulsión",53],
-  ["retinolCrema","Power Retinol · Crema",57],["retinolEmulsion","Power Retinol · Emulsión",57],
-  ["oxygenCrema","Power Oxygen · Crema",57],["oxygenEmulsion","Power Oxygen · Emulsión",57]
+  ["correctiveCrema","Corrective · Crema",75.60,"7740","1600","CORRECTIVE CHRISTMAS KIT 2026 (CREAM)"],
+  ["correctiveEmulsion","Corrective · Emulsión",75.60,"7741","1600","CORRECTIVE CHRISTMAS KIT 2026 (EMULSION)"],
+  ["globalSecas","Global Lift · Pieles secas",72.45,"7760","1600","KIT GLOBAL LIFT P.SECAS NAVIDAD 2026"],
+  ["globalMixtas","Global Lift · Pieles mixtas",72.45,"7761","1600","KIT GLOBAL LIFT P.MIXTAS NAVIDAD 2026"],
+  ["eternalCrema","Eternal · Crema",66.15,"7758","1600","KIT ETERNAL (Crema) NAVIDAD 2026"],
+  ["eternalRica","Eternal · Crema rica",66.15,"7759","1600","KIT ETERNAL (Crema rica) NAVIDAD 2026"],
+  ["phCrema","Power Hyaluronic · Crema",49.35,"7762","1600","KIT POWER HYALURONIC CREMA NAVIDAD 2026"],
+  ["phEmulsion","Power Hyaluronic · Emulsión",49.35,"7763","1600","KIT POWER HYALURONIC EMULSION NAVIDAD 2026"],
+  ["pcCrema","Power C+ · Crema",52.50,"7748","1600","KIT POWER C+ CREMA NAVIDAD 2026"],
+  ["pcEmulsion","Power C+ · Emulsión",52.50,"7749","1600","KIT POWER C+ EMULSION NAVIDAD 2026"],
+  ["retinolCrema","Power Retinol · Crema",56.70,"7768","1600","KIT POWER RETINOL CREMA NAVIDAD 2026"],
+  ["retinolEmulsion","Power Retinol · Emulsión",56.70,"7769","1600","KIT POWER RETINOL EMULSION NAVIDAD 2026"],
+  ["oxygenCrema","Power Oxygen · Crema",56.70,"7766","1600","POWER OXYGEN CHRISTMAS KIT 2026 (CREAM)"],
+  ["oxygenEmulsion","Power Oxygen · Emulsión",56.70,"7767","1600","POWER OXYGEN CHRISTMAS KIT 2026 (EMULSION)"]
  ],
- timeless:[["timelessCream","Timeless Prodigy · The Cream",79],["timelessSerum","Timeless Prodigy · The Serum",85]],
- aquatherm:[["aquaSecas","Aquatherm · Normales a secas",30],["aquaGrasas","Aquatherm · Normales a grasas",30]],
- perfumes:[["perfume","Perfume",23]],
+ timeless:[
+  ["timelessCream","Timeless Prodigy · The Cream",72.60,"7738","1600","TIMELESS PRODIGY CHRISTMAS KIT 2026 (CREAM)"],
+  ["timelessSerum","Timeless Prodigy · The Serum",79.20,"7739","1600","TIMELESS PRODIGY CHRISTMAS KIT 2026 (SERUM)"]
+ ],
+ aquatherm:[
+  ["aquaSecas","Aquatherm · Normales a secas",29.60,"7770","1600","KIT AQUATHERM CREMA PIELES NORMALES A SECAS NAVIDAD 2026"],
+  ["aquaGrasas","Aquatherm · Normales a grasas",29.60,"7771","1600","KIT AQUATHERM CREMA PIELES NORMALES A GRASAS NAVIDAD 2026"]
+ ],
+ perfumes:[
+  ["perfume","Fragancias Notes of Celebration",49.00,"7737","1600","FRAGANCIAS NOTES OF CELEBRATION"]
+ ],
  cabina:[
-["cabAquatherm","Programa profesional pieles sensibles Aquatherm",51.30],
-["cabHyaluronic","Programa profesional Power Hyaluronic",62.40],
-["cabPowerC","Programa profesional Power C iluminador",61.40],
-["cabOxygen","Programa oxígeno y antipolución",72.75],
-["cabRetinol","Programa profesional intenso de retinol",68.05],
-["cabCorrective","Tratamiento corrector de arrugas",100.60],
-["cabEternal","Programa profesional redensificante Eternal",79.40],
-["cabGlobal","Programa Lifting antigravedad Global Lift",95.10],
-["cabProdigy","Tratamiento profesional Timeless Prodigy",154.20]
-]
+  ["cabAquatherm","Programa profesional pieles sensibles",51.30,"6680","2600","Programa profesional pieles sensibles"],
+  ["cabHyaluronic","HA Dynamic programa profesional",62.40,"5960","2600","HA dynamic programa profesional"],
+  ["cabPowerC","Programa 35% antioxidante iluminador",64.40,"5440","2600","Programa 35% antioxidante iluminador"],
+  ["cabOxygen","Oxygen O2 skin advanced programme & pollution block",72.75,"5355","2600","Oxygen O2 skin advanced programme & pollution block"],
+  ["cabRetinol","Programa profesional reparador intensivo",68.05,"5730","2600","Programa profesional reparador intensivo"],
+  ["cabCorrective","Tratamiento corrector arrugas y líneas de expresión profesional",100.60,"5245","2600","Tratamiento corrector arrugas y lineas de expresion profesional"],
+  ["cabEternal","Programa profesional redensificante",79.40,"4910","2600","Programa profesional redensificante"],
+  ["cabGlobal","Programa lifting antigravedad profesional",95.10,"5150","2600","Programa lifting antigravedad profesional"],
+  ["cabProdigy","Tratamiento profesional Timeless Prodigy",154.20,"4055","2600","Tratamiento profesional timeless prodigy"]
+ ]
 };
 
 let currentPromo=null,currentTier=null,currentQty={},editingIndex=null;
 let orders=[];
 const $=x=>document.getElementById(x);
 const eur=n=>n.toLocaleString("es-ES",{style:"currency",currency:"EUR"});
+
+const productById=id=>{
+  for(const group of Object.values(PRODUCTS)){
+    const p=group.find(x=>x[0]===id);
+    if(p)return p;
+  }
+  return null;
+};
+const productLabel=p=>`Cód. art. ${p[3]} · Cód. aux. ${p[4]} · ${p[5]} · PVE ${eur(p[2])}`;
+const productOrderLine=(p,qty)=>`Cód. art. ${p[3]} · Aux. ${p[4]} · ${p[5]} · ${qty} ud${qty===1?"":"s"} · PVE ${eur(p[2])}`;
+
 
 function loadLocal(){
   $("comercial").value=localStorage.getItem("xmas_comercial")||"";
@@ -448,7 +478,7 @@ function renderDetail(){
  if(currentPromo==="power") info=`<b>Power & Premium</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Aquatherm bonificados ${t.aq}</span><span class="badge">Perfumes ${t.perf}</span><span class="badge">Descuento ${t.disc}%</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
  if(currentPromo==="timeless") info=`<b>Timeless Prodigy</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus} The Cream</span><span class="badge">Perfumes ${t.perf}</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
  if(currentPromo==="aquatherm") info=`<b>Aquatherm · pedido cerrado</b><br><span class="badge">${t.label}</span><span class="badge">Total ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">Bolsas aniversario ${t.b60}</span><br>El total se carga automáticamente. Solo reparte los cofres entre los dos tipos de piel.`;
- if(currentPromo==="perfumes") info=`<b>Perfumes · pedido cerrado</b><br><span class="badge">${t.label}</span><span class="badge">Total ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">PVE 23 €</span><br>No tienes que introducir unidades: el pedido se carga completo automáticamente.`;
+ if(currentPromo==="perfumes") info=`<b>Perfumes · pedido cerrado</b><br><span class="badge">${t.label}</span><span class="badge">Total ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">PVE ${eur(PRODUCTS.perfumes[0][2])}</span><br>No tienes que introducir unidades: el pedido se carga completo automáticamente.`;
  if(currentPromo==="cabina") info=`<b>Packs de cabina</b><br><span class="badge">Selecciona ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><br>El comercial elige ${t.buy+t.bonus} programas. Se bonifican automáticamente las ${t.bonus} unidad${t.bonus===1?"":"es"} de menor PVE de toda la selección.`;
  $("logicInfo").innerHTML=info;
 
@@ -457,23 +487,29 @@ function renderDetail(){
    currentQty.perfume=t.buy+t.bonus;
    html+=`<div class="closedOrder"><strong>Pedido ${t.label} cargado automáticamente</strong>
      <div class="closedNums"><span class="badge">Total ${t.buy+t.bonus}</span><span class="badge">Facturados ${t.buy}</span><span class="badge">Bonificados ${t.bonus}</span></div></div>`;
-   html+=`<div class="product"><div><b>Perfume</b><small>PVE 23,00 € · se facturan ${t.buy}</small></div>
-     <div class="fixedQty">${t.buy+t.bonus} uds.</div><div class="money" id="m_perfume">${eur(t.buy*23)}</div></div>`;
+   const pp=PRODUCTS.perfumes[0];
+   html+=`<div class="product"><div><b>${pp[1]}</b>
+     <span class="productMeta"><span class="productCode">Cód. art. ${pp[3]}</span> · Cód. aux. ${pp[4]}<br>${pp[5]}<br>PVE ${eur(pp[2])} · se facturan ${t.buy}</span></div>
+     <div class="fixedQty">${t.buy+t.bonus} uds.</div><div class="money" id="m_perfume">${eur(t.buy*pp[2])}</div></div>`;
  }else if(currentPromo==="aquatherm"){
    const total=t.buy+t.bonus;
    currentQty.aquaSecas=total; currentQty.aquaGrasas=0;
    html+=`<div class="closedOrder"><strong>Pedido ${t.label} cargado automáticamente</strong>
      <div class="closedNums"><span class="badge">Total ${total}</span><span class="badge">Facturados ${t.buy}</span><span class="badge">Bonificados ${t.bonus}</span></div>
      <div class="mixHelp">El total siempre será ${total}. Usa +/− únicamente para repartir las unidades entre ambos tipos.</div></div>`;
-   PRODUCTS.aquatherm.forEach(([id,name,price])=>{
-     html+=`<div class="product"><div><b>${name}</b><small>PVE ${eur(price)}</small></div>
+   PRODUCTS.aquatherm.forEach((p)=>{
+     const [id,name,price,codArt,codAux,officialName]=p;
+     html+=`<div class="product"><div><b>${name}</b>
+       <span class="productMeta"><span class="productCode">Cód. art. ${codArt}</span> · Cód. aux. ${codAux}<br>${officialName}<br>PVE ${eur(price)}</span></div>
        <div class="qty"><button onclick="chgAquaMix('${id}',-1)">−</button><input id="q_${id}" value="${currentQty[id]}" readonly><button onclick="chgAquaMix('${id}',1)">+</button></div>
        <div class="money" id="m_${id}">${eur(currentQty[id]*price)}</div></div>`;
    });
  }else{
-   PRODUCTS[currentPromo].forEach(([id,name,price])=>{
+   PRODUCTS[currentPromo].forEach((p)=>{
+     const [id,name,price,codArt,codAux,officialName]=p;
      currentQty[id]=0;
-     html+=`<div class="product"><div><b>${name}</b><small>${price?`PVE ${eur(price)}`:"Precio pendiente"}</small></div>
+     html+=`<div class="product"><div><b>${name}</b>
+       <span class="productMeta"><span class="productCode">Cód. art. ${codArt}</span> · Cód. aux. ${codAux}<br>${officialName}<br>PVE ${eur(price)}</span></div>
      <div class="qty"><button onclick="chg('${id}',-1)">−</button><input id="q_${id}" value="0" readonly><button onclick="chg('${id}',1)">+</button></div>
      <div class="money" id="m_${id}">${eur(0)}</div></div>`;
    });
@@ -482,7 +518,7 @@ function renderDetail(){
    currentQty.bonSecas=0;currentQty.bonGrasas=0;
    html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIÓN · SIN CARGO</div>`;
    html+=`<h3>Reparto de cofres Aquatherm bonificados</h3>`;
-   html+=bonusRow("bonSecas","Aquatherm bonificado · normales a secas")+bonusRow("bonGrasas","Aquatherm bonificado · normales a grasas");
+   html+=bonusRow("bonSecas","Aquatherm bonificado · normales a secas","aquaSecas")+bonusRow("bonGrasas","Aquatherm bonificado · normales a grasas","aquaGrasas");
    html+=`</div>`;
  }
  if(currentPromo==="cabina"){
@@ -491,7 +527,11 @@ function renderDetail(){
  }
  $("products").innerHTML=html;
 }
-function bonusRow(id,name){return `<div class="product"><div><b>${name}</b><small>Sin cargo</small></div><div class="qty"><button onclick="chgBonus('${id}',-1)">−</button><input id="q_${id}" value="0" readonly><button onclick="chgBonus('${id}',1)">+</button></div><div class="money">0,00 €</div></div>`}
+function bonusRow(id,name,productId){
+ const p=productById(productId);
+ const meta=p?`<span class="productMeta"><span class="productCode">Cód. art. ${p[3]}</span> · Cód. aux. ${p[4]}<br>${p[5]}<br>Sin cargo</span>`:`<span class="productMeta">Sin cargo</span>`;
+ return `<div class="product"><div><b>${name}</b>${meta}</div><div class="qty"><button onclick="chgBonus('${id}',-1)">−</button><input id="q_${id}" value="0" readonly><button onclick="chgBonus('${id}',1)">+</button></div><div class="money">0,00 €</div></div>`;
+}
 
 function chgBonus(id,d){
  const t=DATA[currentPromo].tiers[currentTier];
@@ -603,8 +643,8 @@ function currentTotal(){
    const bi=cabinaBonusInfo(currentQty,t.bonus);
    return (boughtCount()===target && bi && !bi.pending) ? gross-bi.total : gross;
  }
- if(currentPromo==="aquatherm") return t.buy*30;
- if(currentPromo==="perfumes") return t.buy*23;
+ if(currentPromo==="aquatherm") return t.buy*PRODUCTS.aquatherm[0][2];
+ if(currentPromo==="perfumes") return t.buy*PRODUCTS.perfumes[0][2];
  const disc=currentPromo==="power"?(t.disc||0):0;
  return gross*(1-disc/100);
 }
@@ -733,28 +773,54 @@ function cabinaBonusInfoForOrder(o){
 function orderLines(o){
  const p=o.promo,t=DATA[p].tiers[o.tier],lines=[];
  if(p==="perfumes"){
-   lines.push(`Perfumes: ${t.buy+t.bonus} unidades`);
+   const prod=PRODUCTS.perfumes[0];
+   lines.push(productOrderLine(prod,t.buy+t.bonus));
    lines.push(`Facturadas: ${t.buy} · BONIFICADAS: ${t.bonus}`);
    return lines;
  }
  if(p==="aquatherm"){
-   if(o.qty.aquaSecas)lines.push(`Aquatherm · Normales a secas: ${o.qty.aquaSecas}`);
-   if(o.qty.aquaGrasas)lines.push(`Aquatherm · Normales a grasas: ${o.qty.aquaGrasas}`);
+   if(o.qty.aquaSecas){
+     const prod=productById("aquaSecas");
+     lines.push(productOrderLine(prod,o.qty.aquaSecas));
+   }
+   if(o.qty.aquaGrasas){
+     const prod=productById("aquaGrasas");
+     lines.push(productOrderLine(prod,o.qty.aquaGrasas));
+   }
    lines.push(`Total: ${t.buy+t.bonus} · Facturadas: ${t.buy} · BONIFICADAS: ${t.bonus}`);
    lines.push(`Bolsas aniversario: ${t.b60}`);
    return lines;
  }
- PRODUCTS[p].forEach(([id,name])=>{if(o.qty[id])lines.push(`${name}: ${o.qty[id]}`)});
+ PRODUCTS[p].forEach((prod)=>{
+   const id=prod[0];
+   if(o.qty[id])lines.push(productOrderLine(prod,o.qty[id]));
+ });
  if(p==="power"&&t.aq>0){
-  if(o.qty.bonSecas)lines.push(`Aquatherm bonif. normales a secas: ${o.qty.bonSecas}`);
-  if(o.qty.bonGrasas)lines.push(`Aquatherm bonif. normales a grasas: ${o.qty.bonGrasas}`);
-  lines.push(`Perfumes regalo: ${t.perf}`,`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`,`Descuento: ${t.disc}%`);
+  if(o.qty.bonSecas){
+    const prod=productById("aquaSecas");
+    lines.push(`BONIFICADO · ${productOrderLine(prod,o.qty.bonSecas)}`);
+  }
+  if(o.qty.bonGrasas){
+    const prod=productById("aquaGrasas");
+    lines.push(`BONIFICADO · ${productOrderLine(prod,o.qty.bonGrasas)}`);
+  }
+  const frag=PRODUCTS.perfumes[0];
+  lines.push(`REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+  lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`,`Descuento: ${t.disc}%`);
  }
- if(p==="timeless")lines.push(`Bonificación The Cream: ${t.bonus}`,`Perfumes regalo: ${t.perf}`,`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`);
+ if(p==="timeless"){
+   const cream=productById("timelessCream"),frag=PRODUCTS.perfumes[0];
+   lines.push(`BONIFICADO · Cód. art. ${cream[3]} · Aux. ${cream[4]} · ${cream[5]} · ${t.bonus} uds.`);
+   lines.push(`REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+   lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`);
+ }
  if(p==="cabina"){
    const bi=cabinaBonusInfoForOrder(o);
    if(bi&&bi.items.length){
-     bi.items.forEach(x=>lines.push(`BONIFICADO automático · ${x.name}: ${x.qty}`));
+     bi.items.forEach(x=>{
+       const prod=productById(x.id);
+       lines.push(`BONIFICADO automático · ${productOrderLine(prod,x.qty)}`);
+     });
      lines.push(`Seleccionadas: ${t.buy+t.bonus} · Facturadas: ${t.buy} · Bonificadas: ${t.bonus}`);
    }
  }

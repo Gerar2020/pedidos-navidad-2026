@@ -346,7 +346,7 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 
   <div class="preview" id="globalFinanceBox" style="margin-top:14px">
     <b>Forma de pago del pedido completo</b>
-    <div class="note" style="margin:4px 0 12px">La financiación se calcula sobre la suma de todas las promociones añadidas.</div>
+    <div class="note" style="margin:4px 0 12px">La financiación se aplica al pedido completo. El máximo de recibos viene determinado por el tramo de Power/Premium o Timeless Prodigy elegido; si se combinan ambas familias, se añade 1 recibo adicional.</div>
     <div class="paygrid">
       <div><label>Máximo por importe total</label><input id="globalMaxPayments" readonly></div>
       <div><label>Nº recibos elegido</label><select id="globalPayments"></select></div>
@@ -375,7 +375,7 @@ const DATA={
  timeless:{title:"Timeless Prodigy",tiers:[
   {buy:8,bonus:1,perf:4,b60:4,bex:9,kit:1},{buy:12,bonus:2,perf:6,b60:6,bex:14,kit:1},
   {buy:18,bonus:3,perf:9,b60:9,bex:21,kit:1},{buy:24,bonus:4,perf:12,b60:12,bex:28,kit:1}]},
- aquatherm:{title:"Aquatherm",tiers:[{label:"9 + 1",buy:9,bonus:1,b60:10},{label:"12 + 3",buy:12,bonus:3,b60:15}]},
+ aquatherm:{title:"Aquatherm",tiers:[{label:"9 + 1",buy:9,bonus:1,b60:10},{label:"12 + 2",buy:12,bonus:2,b60:14}]},
  perfumes:{title:"Perfumes",tiers:[{label:"10 + 1",buy:10,bonus:1},{label:"18 + 2",buy:18,bonus:2}]},
  cabina:{title:"Packs de cabina",tiers:[{label:"3 + 1",buy:3,bonus:1},{label:"6 + 2",buy:6,bonus:2},{label:"9 + 3",buy:9,bonus:3}]}
 };
@@ -582,16 +582,29 @@ function chgAquaMix(id,d){
  calcCurrent();
 }
 
-function financeMax(promo,total){
- if(promo==="timeless"){
-   if(total>=1400)return 4;if(total>=900)return 3;if(total>=300)return 2;return 1;
+function promoTierFinance(o){
+ const t=DATA[o.promo].tiers[o.tier];
+ if(o.promo==="power"){
+   const map={10:2,15:3,20:4,30:6,50:8,60:9,70:10,90:10};
+   return map[t.buy]||1;
  }
- if(total>=4900)return 10;if(total>=4000)return 9;if(total>=3500)return 8;if(total>=3000)return 7;if(total>=2400)return 6;if(total>=1800)return 4;if(total>=900)return 3;if(total>=300)return 2;return 1;
+ if(o.promo==="timeless"){
+   const map={8:2,12:3,18:4,24:5};
+   return map[t.buy]||1;
+ }
+ return 1;
 }
 function globalFinanceMax(total){
- const onlyTimeless=orders.length>0 && orders.every(o=>o.promo==="timeless");
- let max=financeMax(onlyTimeless?"timeless":"power",total);
- if(orders.some(o=>o.promo==="power") && orders.some(o=>o.promo==="timeless")) max+=1;
+ const powerOrders=orders.filter(o=>o.promo==="power");
+ const timelessOrders=orders.filter(o=>o.promo==="timeless");
+
+ let max=1;
+ powerOrders.forEach(o=>max=Math.max(max,promoTierFinance(o)));
+ timelessOrders.forEach(o=>max=Math.max(max,promoTierFinance(o)));
+
+ // Si el pedido combina ambas familias, se concede 1 recibo adicional.
+ if(powerOrders.length && timelessOrders.length) max+=1;
+
  return max;
 }
 function setGlobalPaymentOptions(max){
@@ -878,7 +891,7 @@ function renderFinal(){
  $("finalPreview").innerHTML=html;
  if(combinedExtraMonth()){
    $("combinedNote").classList.remove("hidden");
-   $("combinedNote").textContent="Power/Premium + Timeless Prodigy: se ha añadido 1 recibo adicional al máximo de financiación del pedido completo.";
+   $("combinedNote").textContent="Power/Premium + Timeless Prodigy: se añade 1 recibo adicional al máximo permitido por los tramos seleccionados.";
  }else $("combinedNote").classList.add("hidden");
 }
 $("obs").addEventListener("input",renderFinal);

@@ -923,7 +923,7 @@ async function makePdfFile(){
 
   const {jsPDF}=window.jspdf;
   const pdf=new jsPDF({orientation:"p",unit:"mm",format:"a4"});
-  const pageW=210, pageH=297, margin=14, contentW=pageW-margin*2;
+  const pageW=210, pageH=297, margin=9, contentW=pageW-margin*2;
   const showAmounts=document.getElementById("showFinalAmount")?.checked===true;
   const total=orders.reduce((s,o)=>s+o.total,0);
 
@@ -950,20 +950,49 @@ async function makePdfFile(){
     return w;
   }
   function lineBox(label, value, yy, bonus=false){
-    const h=8.5;
+    const h=7.4;
     if(bonus){
       pdf.setFillColor(255,248,238);
       pdf.setDrawColor(178,139,87);
-      pdf.roundedRect(margin+4,yy-5.8,contentW-8,h,2,2,"FD");
+      pdf.roundedRect(margin+3,yy-5.2,contentW-6,h,1.8,1.8,"FD");
     }else{
       pdf.setDrawColor(236,230,220);
-      pdf.line(margin+4,yy+2.3,pageW-margin-4,yy+2.3);
+      pdf.line(margin+3,yy+1.8,pageW-margin-3,yy+1.8);
     }
-    pdf.setFont("helvetica",bonus?"bold":"normal");pdf.setFontSize(9.2);
-    pdf.text(String(label),margin+7,yy);
-    if(value){
+
+    const left=margin+5;
+    const right=pageW-margin-5;
+    const val=String(value||"");
+    let fontSize=8.6;
+
+    pdf.setFont("helvetica",bonus?"bold":"normal");
+    pdf.setFontSize(fontSize);
+
+    const valWidth=val ? pdf.getTextWidth(val) : 0;
+    const gap=val ? 4 : 0;
+    const available=(right-left)-valWidth-gap;
+    let text=String(label);
+
+    // Reduce font size until the complete article fits on ONE line.
+    while(fontSize>6.0 && pdf.getTextWidth(text)>available){
+      fontSize-=0.2;
+      pdf.setFontSize(fontSize);
+    }
+
+    // Absolute fallback: if an exceptionally long description still does not fit,
+    // compress horizontally rather than wrap it to a second line.
+    if(pdf.getTextWidth(text)>available){
+      const originalScale=pdf.getTextWidth(text)/available;
+      pdf.setCharSpace(-Math.min(0.7,(originalScale-1)*0.55));
+    }
+
+    pdf.text(text,left,yy,{maxWidth:available});
+    pdf.setCharSpace(0);
+
+    if(val){
       pdf.setFont("helvetica","bold");
-      pdf.text(String(value),pageW-margin-7-pdf.getTextWidth(String(value)),yy);
+      pdf.setFontSize(Math.max(fontSize,6.8));
+      pdf.text(val,right-pdf.getTextWidth(val),yy);
     }
   }
 
@@ -1001,7 +1030,7 @@ async function makePdfFile(){
   orders.forEach((o,i)=>{
     const t=DATA[o.promo].tiers[o.tier];
     const lines=orderLines(o);
-    const estimated=24 + lines.length*9 + (showAmounts?10:8);
+    const estimated=22 + lines.length*7 + (showAmounts?9:7);
     ensure(Math.min(estimated,105));
 
     pdf.setFillColor(250,248,245);
@@ -1009,7 +1038,7 @@ async function makePdfFile(){
     const boxStart=y;
     // Draw title first; box height after content is known.
     y+=8;
-    pdf.setFont("helvetica","bold");pdf.setFontSize(12.5);
+    pdf.setFont("helvetica","bold");pdf.setFontSize(11.5);
     pdf.text(`${i+1}. ${DATA[o.promo].title}`,margin+6,y);
     y+=7;
 
@@ -1023,12 +1052,9 @@ async function makePdfFile(){
 
     lines.forEach(ln=>{
       const bonus=/BONIFICAD|bonif/i.test(ln);
-      const wrapped=pdf.splitTextToSize(String(ln),contentW-20);
-      wrapped.forEach((part,j)=>{
-        ensure(8);
-        lineBox(j===0?part:"  "+part,"",y,bonus);
-        y+=7.2;
-      });
+      ensure(7.8);
+      lineBox(String(ln),"",y,bonus);
+      y+=6.8;
     });
 
     ensure(10);

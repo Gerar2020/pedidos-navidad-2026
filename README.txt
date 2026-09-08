@@ -1,8 +1,10 @@
-Pedidos Navidad 2026 · v16
+Pedidos Navidad 2026 · v18
 
-Cambio PDF:
-- Cada artículo se fuerza a una sola línea.
-- El PDF reduce automáticamente el tamaño de letra solo cuando una referencia es larga.
-- Márgenes más estrechos para ganar ancho útil.
-- Bonificados y regalos también se mantienen en una única línea.
-- No se altera la lógica comercial ni de promociones.
+Corrección tester fragancias:
+- Power & Premium: 1 tester automático únicamente en tramos superiores a 10 cofres.
+- Tramo Power & Premium de 10 cofres: SIN tester.
+- Timeless Prodigy: 1 tester automático en todos los tramos.
+- Aquatherm: SIN tester.
+- Perfumes: SIN tester.
+- Packs de cabina / kits de tratamientos: SIN tester.
+- Tester independiente de las fragancias de regalo de cada promoción.

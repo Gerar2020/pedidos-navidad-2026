@@ -382,31 +382,31 @@ const DATA={
 
 const PRODUCTS={
  power:[
-  ["correctiveCrema","Corrective · Crema",75.60,"7740","1600","CORRECTIVE CHRISTMAS KIT 2026 (CREAM)"],
-  ["correctiveEmulsion","Corrective · Emulsión",75.60,"7741","1600","CORRECTIVE CHRISTMAS KIT 2026 (EMULSION)"],
-  ["globalSecas","Global Lift · Pieles secas",72.45,"7760","1600","KIT GLOBAL LIFT P.SECAS NAVIDAD 2026"],
-  ["globalMixtas","Global Lift · Pieles mixtas",72.45,"7761","1600","KIT GLOBAL LIFT P.MIXTAS NAVIDAD 2026"],
-  ["eternalCrema","Eternal · Crema",66.15,"7758","1600","KIT ETERNAL (Crema) NAVIDAD 2026"],
-  ["eternalRica","Eternal · Crema rica",66.15,"7759","1600","KIT ETERNAL (Crema rica) NAVIDAD 2026"],
-  ["phCrema","Power Hyaluronic · Crema",49.35,"7762","1600","KIT POWER HYALURONIC CREMA NAVIDAD 2026"],
-  ["phEmulsion","Power Hyaluronic · Emulsión",49.35,"7763","1600","KIT POWER HYALURONIC EMULSION NAVIDAD 2026"],
-  ["pcCrema","Power C+ · Crema",52.50,"7748","1600","KIT POWER C+ CREMA NAVIDAD 2026"],
-  ["pcEmulsion","Power C+ · Emulsión",52.50,"7749","1600","KIT POWER C+ EMULSION NAVIDAD 2026"],
-  ["retinolCrema","Power Retinol · Crema",56.70,"7768","1600","KIT POWER RETINOL CREMA NAVIDAD 2026"],
-  ["retinolEmulsion","Power Retinol · Emulsión",56.70,"7769","1600","KIT POWER RETINOL EMULSION NAVIDAD 2026"],
-  ["oxygenCrema","Power Oxygen · Crema",56.70,"7766","1600","POWER OXYGEN CHRISTMAS KIT 2026 (CREAM)"],
-  ["oxygenEmulsion","Power Oxygen · Emulsión",56.70,"7767","1600","POWER OXYGEN CHRISTMAS KIT 2026 (EMULSION)"]
+  ["correctiveCrema","Corrective · Crema",76.00,"7756","1600","CORRECTIVE CHRISTMAS KIT 2026 (CREAM)"],
+  ["correctiveEmulsion","Corrective · Emulsión",76.00,"7757","1600","CORRECTIVE CHRISTMAS KIT 2026 (EMULSION)"],
+  ["globalSecas","Global Lift · Pieles secas",67.00,"7760","1600","KIT GLOBAL LIFT P.SECAS NAVIDAD 2026"],
+  ["globalMixtas","Global Lift · Pieles mixtas",67.00,"7761","1600","KIT GLOBAL LIFT P.MIXTAS NAVIDAD 2026"],
+  ["eternalCrema","Eternal · Crema",76.00,"7758","1600","KIT ETERNAL (Crema) NAVIDAD 2026"],
+  ["eternalRica","Eternal · Crema rica",76.00,"7759","1600","KIT ETERNAL (Crema rica) NAVIDAD 2026"],
+  ["phCrema","Power Hyaluronic · Crema",50.00,"7762","1600","KIT POWER HYALURONIC CREMA NAVIDAD 2026"],
+  ["phEmulsion","Power Hyaluronic · Emulsión",50.00,"7763","1600","KIT POWER HYALURONIC EMULSION NAVIDAD 2026"],
+  ["pcCrema","Power C+ · Crema",53.00,"7764","1600","KIT POWER C+ CREMA NAVIDAD 2026"],
+  ["pcEmulsion","Power C+ · Emulsión",53.00,"7765","1600","KIT POWER C+ EMULSION NAVIDAD 2026"],
+  ["retinolCrema","Power Retinol · Crema",57.00,"7768","1600","KIT POWER RETINOL CREMA NAVIDAD 2026"],
+  ["retinolEmulsion","Power Retinol · Emulsión",57.00,"7769","1600","KIT POWER RETINOL EMULSION NAVIDAD 2026"],
+  ["oxygenCrema","Power Oxygen · Crema",57.00,"7766","1600","POWER OXYGEN CHRISTMAS KIT 2026 (CREAM)"],
+  ["oxygenEmulsion","Power Oxygen · Emulsión",57.00,"7767","1600","POWER OXYGEN CHRISTMAS KIT 2026 (EMULSION)"]
  ],
  timeless:[
-  ["timelessCream","Timeless Prodigy · The Cream",72.60,"7738","1600","TIMELESS PRODIGY CHRISTMAS KIT 2026 (CREAM)"],
-  ["timelessSerum","Timeless Prodigy · The Serum",79.20,"7739","1600","TIMELESS PRODIGY CHRISTMAS KIT 2026 (SERUM)"]
+  ["timelessCream","Timeless Prodigy · The Cream",79.00,"7738","1600","TIMELESS PRODIGY CHRISTMAS KIT 2026 (CREAM)"],
+  ["timelessSerum","Timeless Prodigy · The Serum",85.00,"7739","1600","TIMELESS PRODIGY CHRISTMAS KIT 2026 (SERUM)"]
  ],
  aquatherm:[
-  ["aquaSecas","Aquatherm · Normales a secas",29.60,"7770","1600","KIT AQUATHERM CREMA PIELES NORMALES A SECAS NAVIDAD 2026"],
-  ["aquaGrasas","Aquatherm · Normales a grasas",29.60,"7771","1600","KIT AQUATHERM CREMA PIELES NORMALES A GRASAS NAVIDAD 2026"]
+  ["aquaSecas","Aquatherm · Normales a secas",30.00,"7770","1600","KIT AQUATHERM CREMA PIELES NORMALES A SECAS NAVIDAD 2026"],
+  ["aquaGrasas","Aquatherm · Normales a grasas",30.00,"7771","1600","KIT AQUATHERM CREMA PIELES NORMALES A GRASAS NAVIDAD 2026"]
  ],
  perfumes:[
-  ["perfume","Fragancias Notes of Celebration",49.00,"7737","1600","FRAGANCIAS NOTES OF CELEBRATION"]
+  ["perfume","Fragancias Notes of Celebration",26.00,"7737","1600","NOTES OF CELEBRATION"]
  ],
  cabina:[
   ["cabAquatherm","Programa profesional pieles sensibles",51.30,"6680","2600","Programa profesional pieles sensibles"],
@@ -475,8 +475,8 @@ function selectTier(i,b){
 }
 function renderDetail(){
  const t=DATA[currentPromo].tiers[currentTier];let info="";
- if(currentPromo==="power") info=`<b>Power & Premium</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Aquatherm bonificados ${t.aq}</span><span class="badge">Perfumes ${t.perf}</span><span class="badge">Descuento ${t.disc}%</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
- if(currentPromo==="timeless") info=`<b>Timeless Prodigy</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus} The Cream</span><span class="badge">Perfumes ${t.perf}</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
+ if(currentPromo==="power") info=`<b>Power & Premium</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Aquatherm bonificados ${t.aq}</span><span class="badge">Fragancias regalo ${t.perf}</span>${t.buy>10?'<span class="badge">Tester fragancias 1</span>':''}<span class="badge">Descuento ${t.disc}%</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
+ if(currentPromo==="timeless") info=`<b>Timeless Prodigy</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus} The Cream</span><span class="badge">Fragancias regalo ${t.perf}</span><span class="badge">Tester fragancias 1</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
  if(currentPromo==="aquatherm") info=`<b>Aquatherm · pedido cerrado</b><br><span class="badge">${t.label}</span><span class="badge">Total ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">Bolsas aniversario ${t.b60}</span><br>El total se carga automáticamente. Solo reparte los cofres entre los dos tipos de piel.`;
  if(currentPromo==="perfumes") info=`<b>Perfumes · pedido cerrado</b><br><span class="badge">${t.label}</span><span class="badge">Total ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">PVE ${eur(PRODUCTS.perfumes[0][2])}</span><br>No tienes que introducir unidades: el pedido se carga completo automáticamente.`;
  if(currentPromo==="cabina") info=`<b>Packs de cabina</b><br><span class="badge">Selecciona ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><br>El comercial elige ${t.buy+t.bonus} programas. Se bonifican automáticamente las ${t.bonus} unidad${t.bonus===1?"":"es"} de menor PVE de toda la selección.`;
@@ -519,7 +519,20 @@ function renderDetail(){
    html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIÓN · SIN CARGO</div>`;
    html+=`<h3>Reparto de cofres Aquatherm bonificados</h3>`;
    html+=bonusRow("bonSecas","Aquatherm bonificado · normales a secas","aquaSecas")+bonusRow("bonGrasas","Aquatherm bonificado · normales a grasas","aquaGrasas");
+   if(t.buy>10){
+     const frag=PRODUCTS.perfumes[0];
+     html+=`<div class="bonusAuto" style="margin-top:12px"><b>TESTER FRAGANCIAS · 1 UD. AUTOMÁTICA</b><br>
+       <span class="productMeta"><span class="productCode">Cód. art. ${frag[3]}</span> · Cód. aux. ${frag[4]} · ${frag[5]}<br>Se añade como tester, sin cargo, aparte de las fragancias de regalo de la promoción.</span>
+     </div>`;
+   }
    html+=`</div>`;
+ }
+ if(currentPromo==="timeless"){
+   const frag=PRODUCTS.perfumes[0];
+   html+=`<div class="bonusSection"><div class="sectionDivider">TESTER · SIN CARGO</div>
+   <div class="bonusAuto"><b>TESTER FRAGANCIAS · 1 UD. AUTOMÁTICA</b><br>
+     <span class="productMeta"><span class="productCode">Cód. art. ${frag[3]}</span> · Cód. aux. ${frag[4]} · ${frag[5]}<br>Se añade como tester, sin cargo, aparte de las fragancias de regalo de la promoción.</span>
+   </div></div>`;
  }
  if(currentPromo==="cabina"){
    html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIÓN · SIN CARGO</div>
@@ -806,12 +819,14 @@ function orderLines(o){
   }
   const frag=PRODUCTS.perfumes[0];
   lines.push(`REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+  if(t.buy>10) lines.push(`TESTER · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
   lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`,`Descuento: ${t.disc}%`);
  }
  if(p==="timeless"){
    const cream=productById("timelessCream"),frag=PRODUCTS.perfumes[0];
    lines.push(`BONIFICADO · Cód. art. ${cream[3]} · Aux. ${cream[4]} · ${cream[5]} · ${t.bonus} uds.`);
    lines.push(`REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+   lines.push(`TESTER · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
    lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`);
  }
  if(p==="cabina"){
@@ -1051,7 +1066,7 @@ async function makePdfFile(){
     y+=8;
 
     lines.forEach(ln=>{
-      const bonus=/BONIFICAD|bonif/i.test(ln);
+      const bonus=/BONIFICAD|bonif|TESTER/i.test(ln);
       ensure(7.8);
       lineBox(String(ln),"",y,bonus);
       y+=6.8;

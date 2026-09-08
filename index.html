@@ -42,6 +42,52 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 .note{font-size:12px;color:var(--muted);line-height:1.45}
 
 
+
+.bonusSummary{
+  margin-top:12px;
+  padding:12px;
+  border-radius:14px;
+  background:#fff8ef;
+  border:1px solid #e2c9a7;
+}
+.bonusSummaryTitle{
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.04em;
+  color:#7a5932;
+  margin-bottom:8px;
+}
+.bonusSummaryGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.bonusSummaryItem{
+  background:#fff;
+  border:1px solid #ead9c1;
+  border-radius:12px;
+  padding:10px;
+  min-height:66px;
+}
+.bonusSummaryItem .big{
+  display:block;
+  font-size:20px;
+  font-weight:900;
+  color:#171717;
+}
+.bonusSummaryItem .small{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+  color:#6e6256;
+  line-height:1.2;
+  margin-top:3px;
+}
+.bonusSummaryItem.locked{opacity:.45}
+@media(max-width:760px){
+  .bonusSummaryGrid{grid-template-columns:1fr 1fr}
+}
+
 .bonusSection{
   margin-top:18px;
   padding:14px;
@@ -198,7 +244,7 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
   .promoCtaGrid{grid-template-columns:1fr 1fr}
 }
 
-.builderContext{
+.builderContext{display:none!important;
   position:sticky;top:8px;z-index:25;
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   margin:-4px 0 14px;padding:12px 14px;border-radius:14px;
@@ -509,6 +555,39 @@ function powerTierIndexForCount(count){
   DATA.power.tiers.forEach((t,i)=>{if(count>=t.buy)idx=i});
   return idx;
 }
+
+function timelessTierIndexForCount(count){
+  let idx=0;
+  DATA.timeless.tiers.forEach((t,i)=>{if(count>=t.buy)idx=i});
+  return idx;
+}
+function timelessNextTierIndex(count){
+  const i=DATA.timeless.tiers.findIndex(t=>t.buy>count);
+  return i<0?null:i;
+}
+function syncTimelessTier(){
+  if(currentPromo!=="timeless")return;
+  currentTier=timelessTierIndexForCount(boughtCount());
+}
+function timelessBenefitText(t){
+  const parts=[];
+  if(t.bonus)parts.push(`${t.bonus} The Cream`);
+  if(t.perf)parts.push(`${t.perf} fragancias`);
+  parts.push(`1 tester`);
+  if(t.b60)parts.push(`${t.b60} bolsas 60`);
+  if(t.bex)parts.push(`${t.bex} bolsas exclusivas`);
+  if(t.kit)parts.push(`${t.kit} kit`);
+  return parts.join(" · ");
+}
+function timelessUpgradeGain(current,next){
+  return {
+    bonus:Math.max(0,(next.bonus||0)-(current.bonus||0)),
+    perf:Math.max(0,(next.perf||0)-(current.perf||0)),
+    b60:Math.max(0,(next.b60||0)-(current.b60||0)),
+    bex:Math.max(0,(next.bex||0)-(current.bex||0)),
+    kit:Math.max(0,(next.kit||0)-(current.kit||0))
+  };
+}
 function powerNextTierIndex(count){
   const i=DATA.power.tiers.findIndex(t=>t.buy>count);
   return i<0?null:i;
@@ -563,7 +642,7 @@ function startPromo(key,index=null){
  $("builderContextTitle").textContent=`${DATA[key].title}${orders.length?` · ${orders.length} pedido${orders.length===1?"":"s"} ya añadido${orders.length===1?"":"s"}`:" · primer pedido"}`;
  renderTiers();
  $("builderCard").classList.remove("hidden");
- if(key==="power"){
+ if(key==="power"||key==="timeless"){
    currentTier=0;
    renderDetail();
    $("productArea").classList.remove("hidden");
@@ -579,10 +658,10 @@ function startPromo(key,index=null){
 function goOrders(){window.scrollTo({top:$("ordersList").closest(".card").offsetTop-10,behavior:"smooth"})}
 function renderTiers(){
  $("tiers").innerHTML="";
- if(currentPromo==="power"){
+ if(currentPromo==="power"||currentPromo==="timeless"){
    const b=document.createElement("button");
    b.className="tier active";
-   b.textContent="Selección libre · 10 a 90 cofres";
+   b.textContent=currentPromo==="power"?"Selección libre · 10 a 90 cofres":"Selección libre · 8 a 24 cofres";
    b.disabled=true;
    $("tiers").appendChild(b);
    return;
@@ -600,7 +679,7 @@ function selectTier(i,b){
 function renderDetail(){
  const t=DATA[currentPromo].tiers[currentTier];let info="";
  if(currentPromo==="power") info=`<b>Power & Premium · selección abierta</b><br><span class="badge">Empieza a seleccionar cofres</span><span class="badge">La app aplica automáticamente el mejor tramo alcanzado</span><br>El asistente te irá indicando cuántas unidades faltan para desbloquear la siguiente mejora.`;
- if(currentPromo==="timeless") info=`<b>Timeless Prodigy</b><br><span class="badge">Compra ${t.buy}</span><span class="badge">Bonifica ${t.bonus} The Cream</span><span class="badge">Fragancias regalo ${t.perf}</span><span class="badge">Tester fragancias 1</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
+ if(currentPromo==="timeless") info=`<b>Timeless Prodigy · selección abierta</b><br><span class="badge">La app aplica automáticamente el mejor tramo alcanzado</span><br>El asistente te indicará cuánto falta para el siguiente tramo y qué mejoras consigues.`;
  if(currentPromo==="aquatherm") info=`<b>Aquatherm · pedido cerrado</b><br><span class="badge">${t.label}</span><span class="badge">Total ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">Bolsas aniversario ${t.b60}</span><br>El total se carga automáticamente. Solo reparte los cofres entre los dos tipos de piel.`;
  if(currentPromo==="perfumes") info=`<b>Perfumes · pedido cerrado</b><br><span class="badge">${t.label}</span><span class="badge">Total ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><span class="badge">PVE ${eur(PRODUCTS.perfumes[0][2])}</span><br>No tienes que introducir unidades: el pedido se carga completo automáticamente.`;
  if(currentPromo==="cabina") info=`<b>Packs de cabina</b><br><span class="badge">Selecciona ${t.buy+t.bonus}</span><span class="badge">Factura ${t.buy}</span><span class="badge">Bonifica ${t.bonus}</span><br>El comercial elige ${t.buy+t.bonus} programas. Se bonifican automáticamente las ${t.bonus} unidad${t.bonus===1?"":"es"} de menor PVE de toda la selección.`;
@@ -609,6 +688,9 @@ function renderDetail(){
  let html="";
  if(currentPromo==="power"){
    html+=`<div class="powerUpgrade" id="powerUpgradeCard"></div>`;
+ }
+ if(currentPromo==="timeless"){
+   html+=`<div class="powerUpgrade" id="timelessUpgradeCard"></div>`;
  }
  if(currentPromo==="perfumes"){
    currentQty.perfume=t.buy+t.bonus;
@@ -643,15 +725,17 @@ function renderDetail(){
  }
  if(currentPromo==="power"){
    currentQty.bonSecas=0;currentQty.bonGrasas=0;
-   html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIÓN · SIN CARGO</div>`;
-   html+=`<h3 id="powerBonusHeading">Aquatherm bonificados · todavía no desbloqueados</h3>`;
+   html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIONES · SIN CARGO</div>
+   <div class="bonusSummary">
+     <div class="bonusSummaryTitle">Todo lo que incluye gratis este tramo</div>
+     <div class="bonusSummaryGrid">
+       <div class="bonusSummaryItem" id="bonusAqCard"><span class="big" id="bonusAqQty">0</span><span class="small">Aquatherm bonificados</span></div>
+       <div class="bonusSummaryItem" id="bonusPerfCard"><span class="big" id="bonusPerfQty">0</span><span class="small">fragancias de regalo</span></div>
+       <div class="bonusSummaryItem" id="bonusTesterCard"><span class="big" id="bonusTesterQty">0</span><span class="small">tester de fragancias</span></div>
+     </div>
+   </div>
+   <h3 id="powerBonusHeading">Aquatherm bonificados · todavía no desbloqueados</h3>`;
    html+=bonusRow("bonSecas","Aquatherm bonificado · normales a secas","aquaSecas")+bonusRow("bonGrasas","Aquatherm bonificado · normales a grasas","aquaGrasas");
-   const frag=PRODUCTS.perfumes[0];
-   html+=`<div class="bonusAuto hidden" id="powerFragranceAuto" style="margin-top:12px">
-     <b id="powerFragranceTitle">FRAGANCIAS INCLUIDAS</b><br>
-     <span class="productMeta"><span class="productCode">Cód. art. ${frag[3]}</span> · Cód. aux. ${frag[4]} · ${frag[5]}<br>
-     <span id="powerFragranceDetail"></span></span>
-   </div>`;
    html+=`</div>`;
  }
  if(currentPromo==="timeless"){
@@ -687,7 +771,7 @@ function chgBonus(id,d){
 function boughtCount(){return PRODUCTS[currentPromo].reduce((s,[id])=>s+(currentQty[id]||0),0)}
 function chg(id,d){
  const t=DATA[currentPromo].tiers[currentTier];
- const max=currentPromo==="power"?90:(currentPromo==="cabina"?(t.buy+(t.bonus||0)):t.buy);
+ const max=currentPromo==="power"?90:(currentPromo==="timeless"?24:(currentPromo==="cabina"?(t.buy+(t.bonus||0)):t.buy));
  if(d>0&&boughtCount()>=max)return;
  currentQty[id]=Math.max(0,(currentQty[id]||0)+d);
  $("q_"+id).value=currentQty[id];
@@ -766,6 +850,7 @@ function cabinaBonusInfo(qtyObj=currentQty,bonusCount=null){
 }
 function currentTotal(){
  if(currentPromo==="power")syncPowerTier();
+ if(currentPromo==="timeless")syncTimelessTier();
  const t=DATA[currentPromo].tiers[currentTier];
  const gross=currentGross();
  if(currentPromo==="cabina"){
@@ -788,6 +873,11 @@ function currentValid(){
    const pt=DATA.power.tiers[currentTier], count=boughtCount();
    return count>=10 && count<=90 && ((currentQty.bonSecas||0)+(currentQty.bonGrasas||0)===pt.aq);
  }
+ if(currentPromo==="timeless"){
+   syncTimelessTier();
+   const count=boughtCount();
+   return count>=8 && count<=24;
+ }
  const target=currentPromo==="cabina"?(t.buy+t.bonus):t.buy;
  let v=boughtCount()===target;
  return v;
@@ -797,69 +887,46 @@ function updatePowerUpgrade(){
  if(currentPromo!=="power")return;
  syncPowerTier();
  const count=boughtCount();
- const current=DATA.power.tiers[currentTier];
- const nextIdx=powerNextTierIndex(count);
- const next=nextIdx===null?null:DATA.power.tiers[nextIdx];
  const card=$("powerUpgradeCard");
  if(!card)return;
+ if(count>=10){card.classList.add("hidden");return}
+ card.classList.remove("hidden");
+ const first=DATA.power.tiers[0],left=10-count;
+ const g={aq:first.aq||0,perf:first.perf||0,disc:first.disc||0,tester:0};
+ card.innerHTML=`<div class="powerUpgradeTop"><div><div class="powerUpgradeEyebrow">PRIMER OBJETIVO</div><div class="powerUpgradeTitle">Llevas ${count} cofres</div></div><div class="powerUpgradeNext">Faltan ${left} para tramo 10</div></div>
+ <div class="powerUpgradeBar"><div class="powerUpgradeFill" style="width:${Math.min(100,count/10*100)}%"></div></div>
+ <div class="upgradeHeadline ${left<=3?"near":""}">Añade ${left} cofre${left===1?"":"s"} y desbloqueas la promoción de 10.</div>
+ <div class="upgradeGain">${powerGainCards(g)}</div>`;
+}
 
- if(count<10){
-   const left=10-count;
-   const first=DATA.power.tiers[0];
-   const g={aq:first.aq||0,perf:first.perf||0,disc:first.disc||0,tester:0};
-   card.innerHTML=`
-   <div class="powerUpgradeTop">
-     <div><div class="powerUpgradeEyebrow">PRIMER OBJETIVO</div><div class="powerUpgradeTitle">Llevas ${count} cofres</div></div>
-     <div class="powerUpgradeNext">Faltan ${left} para tramo 10</div>
-   </div>
-   <div class="powerUpgradeBar"><div class="powerUpgradeFill" style="width:${Math.min(100,count/10*100)}%"></div></div>
-   <div class="upgradeHeadline ${left<=3?"near":""}">Añade ${left} cofre${left===1?"":"s"} y desbloqueas la promoción de 10.</div>
-   <div class="upgradeGain">${powerGainCards(g)}</div>`;
-   return;
- }
 
- if(!next){
-   card.innerHTML=`
-   <div class="powerUpgradeTop">
-     <div><div class="powerUpgradeEyebrow">MÁXIMO ALCANZADO</div><div class="powerUpgradeTitle">Promoción 90 desbloqueada ✓</div></div>
-   </div>
-   <div class="powerUpgradeBar"><div class="powerUpgradeFill" style="width:100%"></div></div>
-   <div class="upgradeHeadline">Has alcanzado el máximo nivel de la campaña.</div>`;
-   return;
- }
-
- const remaining=next.buy-count;
- const prevBuy=current.buy;
- const span=Math.max(1,next.buy-prevBuy);
- const pct=Math.max(0,Math.min(100,(count-prevBuy)/span*100));
- const gain=powerUpgradeGain(current,next);
-
- card.innerHTML=`
- <div class="powerUpgradeTop">
-   <div><div class="powerUpgradeEyebrow">TRAMO ACTUAL</div><div class="powerUpgradeTitle">${count} cofres · promoción ${current.buy}</div></div>
-   <div class="powerUpgradeNext">Siguiente objetivo: ${next.buy}</div>
- </div>
- <div class="powerUpgradeBar"><div class="powerUpgradeFill" style="width:${pct}%"></div></div>
- <div class="upgradeHeadline ${remaining<=6?"near":""}">
-   ${remaining<=6?"⚡ ":""}Te faltan <b>${remaining}</b> cofre${remaining===1?"":"s"} para subir al tramo ${next.buy}.
- </div>
- <div class="upgradeGain">${powerGainCards(gain)}</div>
- <div class="powerUpgradeCompare" style="margin-top:10px">
-   <div class="powerBenefit"><b>Ahora tienes</b>${powerBenefitText(current)}</div>
-   <div class="powerArrow">→</div>
-   <div class="powerBenefit"><b>Al subir tendrás</b>${powerBenefitText(next)}</div>
- </div>`;
+function updateTimelessUpgrade(){
+ if(currentPromo!=="timeless")return;
+ syncTimelessTier();
+ const count=boughtCount(), card=$("timelessUpgradeCard");
+ if(!card)return;
+ if(count>=8){card.classList.add("hidden");return}
+ card.classList.remove("hidden");
+ const first=DATA.timeless.tiers[0], left=8-count;
+ card.innerHTML=`<div class="powerUpgradeTop"><div><div class="powerUpgradeEyebrow">PRIMER OBJETIVO</div><div class="powerUpgradeTitle">Llevas ${count} cofres</div></div><div class="powerUpgradeNext">Faltan ${left} para tramo 8</div></div>
+ <div class="powerUpgradeBar"><div class="powerUpgradeFill" style="width:${Math.min(100,count/8*100)}%"></div></div>
+ <div class="upgradeHeadline ${left<=2?"near":""}">Añade ${left} cofre${left===1?"":"s"} y desbloqueas el tramo 8.</div>`;
 }
 
 function updateFloatingProgress(){
   if(currentPromo===null||currentTier===null){$("floatingProgress").classList.add("hidden");return}
   if(currentPromo==="power")syncPowerTier();
+ if(currentPromo==="timeless")syncTimelessTier();
   const t=DATA[currentPromo].tiers[currentTier];
   const selected=boughtCount();
   let total=(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?(t.buy+t.bonus):t.buy;
   if(currentPromo==="power"){
     const ni=powerNextTierIndex(selected);
     total=selected<10?10:(ni===null?90:DATA.power.tiers[ni].buy);
+  }
+  if(currentPromo==="timeless"){
+    const ni=timelessNextTierIndex(selected);
+    total=selected<8?8:(ni===null?24:DATA.timeless.tiers[ni].buy);
   }
   const remaining=Math.max(0,total-selected);
   const pct=total?Math.min(100,(selected/total)*100):0;
@@ -869,10 +936,12 @@ function updateFloatingProgress(){
   $("fpMain").textContent=`${selected} / ${total}`;
   $("fpRemain").textContent=currentPromo==="power"
     ?(selected>=90?"Máximo alcanzado ✓":`Faltan ${remaining} para siguiente tramo`)
-    :(remaining===0?((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?"Selección completa ✓":"Facturado completo ✓"):((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?`Faltan ${remaining} por seleccionar`:`Faltan ${remaining} facturados`));
+    :currentPromo==="timeless"
+      ?(selected>=24?"Máximo alcanzado ✓":`Faltan ${remaining} para siguiente tramo`)
+      :(remaining===0?((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?"Selección completa ✓":"Facturado completo ✓"):((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?`Faltan ${remaining} por seleccionar`:`Faltan ${remaining} facturados`));
   $("fpRemain").className="fpRemain "+(remaining===0?"fpOk":"fpWarn");
   $("fpTitle").textContent=DATA[currentPromo].title;
-  $("fpMainLabel").textContent=currentPromo==="power"?"COFRES":((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?"SELECCIONADOS":"FACTURADO");
+  $("fpMainLabel").textContent=(currentPromo==="power"||currentPromo==="timeless")?"COFRES":((currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?"SELECCIONADOS":"FACTURADO");
 
   let bonusTotal=0, bonusSelected=0, bonusLabel="";
   if(currentPromo==="power" && (t.aq||0)>0){
@@ -889,7 +958,30 @@ function updateFloatingProgress(){
     bonusTotal=t.bonus||0; bonusSelected=(boughtCount()===(t.buy+t.bonus)?bonusTotal:0); bonusLabel="Pack cabina";
   }
 
-  if(bonusTotal>0){
+  
+  if(currentPromo==="power" && selected>=10 && selected<90){
+    const ni=powerNextTierIndex(selected);
+    if(ni!==null){
+      const cur=DATA.power.tiers[currentTier], nxt=DATA.power.tiers[ni], g=powerUpgradeGain(cur,nxt), gains=[];
+      if(g.aq>0)gains.push(`+${g.aq} Aquatherm`);
+      if(g.perf>0)gains.push(`+${g.perf} fragancias`);
+      if(g.disc>0)gains.push(`+${g.disc}% dto.`);
+      if(g.tester>0)gains.push(`+1 tester`);
+      $("fpTitle").textContent=`Power & Premium · al subir: ${gains.join(" · ")}`;
+    }
+  }else if(currentPromo==="timeless" && selected>=8 && selected<24){
+    const ni=timelessNextTierIndex(selected);
+    if(ni!==null){
+      const cur=DATA.timeless.tiers[currentTier], nxt=DATA.timeless.tiers[ni], g=timelessUpgradeGain(cur,nxt), gains=[];
+      if(g.bonus>0)gains.push(`+${g.bonus} The Cream`);
+      if(g.perf>0)gains.push(`+${g.perf} fragancias`);
+      if(g.b60>0)gains.push(`+${g.b60} bolsas 60`);
+      if(g.bex>0)gains.push(`+${g.bex} bolsas excl.`);
+      if(g.kit>0)gains.push(`+${g.kit} kit`);
+      $("fpTitle").textContent=`Timeless · al subir: ${gains.join(" · ")}`;
+    }
+  }
+if(bonusTotal>0){
     $("fpBonusRow").classList.remove("hidden");
     const bpct=Math.min(100,(bonusSelected/bonusTotal)*100);
     $("fpBonusFill").style.width=bpct+"%";
@@ -914,7 +1006,8 @@ function calcCurrent(){
  $("promoTotal").classList.toggle("hidden",!showAmt);
  $("promoTotalHidden").classList.toggle("hidden",showAmt);
  $("discountLine").classList.toggle("hidden",!showAmt);
- let count=boughtCount(),target=(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?(t.buy+t.bonus):t.buy,txt=currentPromo==="power"?`Seleccionados: ${count} · Tramo alcanzado: ${count>=10?t.buy:"todavía ninguno"}`:`Seleccionados: ${count} de ${target}`;
+ let count=boughtCount(),target=(currentPromo==="cabina"||currentPromo==="aquatherm"||currentPromo==="perfumes")?(t.buy+t.bonus):t.buy,txt=currentPromo==="power"?`Seleccionados: ${count} · Tramo alcanzado: ${count>=10?t.buy:"todavía ninguno"}`:
+ currentPromo==="timeless"?`Seleccionados: ${count} · Tramo alcanzado: ${count>=8?t.buy:"todavía ninguno"}`:`Seleccionados: ${count} de ${target}`;
  if(currentPromo==="power")txt+=` · Aquatherm bonificados: ${(currentQty.bonSecas||0)+(currentQty.bonGrasas||0)} de ${count>=10?t.aq:0}`;
  if(currentPromo==="aquatherm")txt+=` · Pedido cerrado ${t.label} ✓`;
  if(currentPromo==="perfumes")txt+=` · Pedido cerrado ${t.label} ✓`;
@@ -924,27 +1017,26 @@ function calcCurrent(){
    updatePowerUpgrade();
    const bh=$("powerBonusHeading");
    if(bh)bh.textContent=t.aq>0?`Reparto de cofres Aquatherm bonificados · ${t.aq} disponibles`:"Aquatherm bonificados · se desbloquean desde el tramo 15";
-   const fragranceBox=$("powerFragranceAuto");
-   if(fragranceBox){
-     fragranceBox.classList.toggle("hidden",count<10);
-     const title=$("powerFragranceTitle");
-     const detail=$("powerFragranceDetail");
-     if(title){
-       title.textContent=t.buy>10
-         ?`CON ESTE PEDIDO: ${t.perf} FRAGANCIAS + 1 TESTER`
-         :`CON ESTE PEDIDO: ${t.perf} FRAGANCIAS DE REGALO`;
-     }
-     if(detail){
-       detail.textContent=t.buy>10
-         ?`${t.perf} fragancias incluidas en la promoción + 1 unidad adicional como tester, todo sin cargo.`
-         :`${t.perf} fragancias incluidas en la promoción. El tramo de 10 no lleva tester.`;
-     }
-   }
+   const aqQty=$("bonusAqQty"),perfQty=$("bonusPerfQty"),testerQty=$("bonusTesterQty");
+   const aqCard=$("bonusAqCard"),perfCard=$("bonusPerfCard"),testerCard=$("bonusTesterCard");
+   if(aqQty)aqQty.textContent=count>=10?t.aq:0;
+   if(perfQty)perfQty.textContent=count>=10?t.perf:0;
+   if(testerQty)testerQty.textContent=count>=15?1:0;
+   if(aqCard)aqCard.classList.toggle("locked",!(count>=15&&t.aq>0));
+   if(perfCard)perfCard.classList.toggle("locked",count<10);
+   if(testerCard)testerCard.classList.toggle("locked",count<15);
    $("logicInfo").innerHTML=count<10
      ?`<b>Power & Premium · selección abierta</b><br><span class="badge">Llevas ${count} cofres</span><span class="badge">Primer tramo: 10</span><br>Selecciona libremente. La aplicación irá aplicando automáticamente el mejor tramo alcanzado.`
-     :`<b>Power & Premium · tramo ${t.buy} alcanzado</b><br><span class="badge">${count} cofres seleccionados</span><span class="badge">Aquatherm ${t.aq}</span><span class="badge">Fragancias ${t.perf}</span>${t.buy>10?'<span class="badge">Tester 1</span>':''}<span class="badge">Descuento ${t.disc}%</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
+     :`<b>Power & Premium · tramo ${t.buy} alcanzado</b><br><span class="badge">${count} cofres seleccionados</span><span class="badge">Bonificación: ${t.aq} Aquatherm + ${t.perf} fragancias${t.buy>10?" + 1 tester":""}</span><span class="badge">Descuento ${t.disc}%</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
  }
- if(currentPromo==="cabina"){
+ 
+ if(currentPromo==="timeless"){
+   updateTimelessUpgrade();
+   $("logicInfo").innerHTML=count<8
+     ?`<b>Timeless Prodigy · selección abierta</b><br><span class="badge">Llevas ${count} cofres</span><span class="badge">Primer tramo: 8</span>`
+     :`<b>Timeless Prodigy · tramo ${t.buy} alcanzado</b><br><span class="badge">${count} cofres seleccionados</span><span class="badge">Bonifica ${t.bonus} The Cream</span><span class="badge">Fragancias ${t.perf}</span><span class="badge">Tester 1</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
+ }
+if(currentPromo==="cabina"){
    const bi=cabinaBonusInfo(currentQty,t.bonus);
    const el=$("cabinaBonusAuto");
    if(el){
@@ -959,7 +1051,7 @@ function calcCurrent(){
  updateFloatingProgress();
 }
 function addConfiguredOrder(){
- if(!currentValid()){alert(currentPromo==="power"?"Para añadir Power & Premium necesitas al menos 10 cofres y completar los Aquatherm bonificados del tramo alcanzado.":"Completa todas las unidades del tramo antes de añadir la promoción.");return}
+ if(!currentValid()){alert(currentPromo==="power"?"Para añadir Power & Premium necesitas al menos 10 cofres y completar los Aquatherm bonificados del tramo alcanzado.":currentPromo==="timeless"?"Para añadir Timeless Prodigy necesitas al menos 8 cofres.":"Completa todas las unidades del tramo antes de añadir la promoción.");return}
  const t=DATA[currentPromo].tiers[currentTier];const gross=currentGross();const disc=currentPromo==="power"?(t.disc||0):0;const total=currentTotal();
  const order={promo:currentPromo,tier:currentTier,qty:JSON.parse(JSON.stringify(currentQty)),gross,disc,total};
  if(editingIndex===null)orders.push(order);else orders[editingIndex]=order;
@@ -1029,15 +1121,15 @@ function orderLines(o){
     lines.push(`BONIFICADO · ${productOrderLine(prod,o.qty.bonGrasas)}`);
   }
   const frag=PRODUCTS.perfumes[0];
-  lines.push(`FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
-  if(t.buy>10) lines.push(`TESTER ADICIONAL · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
+  lines.push(`BONIFICACIÓN · FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+  if(t.buy>10) lines.push(`BONIFICACIÓN · TESTER ADICIONAL · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
   lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`,`Descuento: ${t.disc}%`);
  }
  if(p==="timeless"){
    const cream=productById("timelessCream"),frag=PRODUCTS.perfumes[0];
    lines.push(`BONIFICADO · Cód. art. ${cream[3]} · Aux. ${cream[4]} · ${cream[5]} · ${t.bonus} uds.`);
-   lines.push(`FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
-   lines.push(`TESTER ADICIONAL · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
+   lines.push(`BONIFICACIÓN · FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+   lines.push(`BONIFICACIÓN · TESTER ADICIONAL · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
    lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`);
  }
  if(p==="cabina"){

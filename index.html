@@ -346,9 +346,9 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 
   <div class="preview" id="globalFinanceBox" style="margin-top:14px">
     <b>Forma de pago del pedido completo</b>
-    <div class="note" style="margin:4px 0 12px">La financiación se aplica al pedido completo. El máximo de recibos viene determinado por el tramo de Power/Premium o Timeless Prodigy elegido; si se combinan ambas familias, se añade 1 recibo adicional.</div>
+    <div class="note" style="margin:4px 0 12px">La forma de pago se elige libremente sobre el pedido completo. El comercial puede seleccionar entre contado y hasta 9 recibos, independientemente del importe o de las promociones incluidas.</div>
     <div class="paygrid">
-      <div><label>Máximo por importe total</label><input id="globalMaxPayments" readonly></div>
+      <div><label>Opciones disponibles</label><input id="globalMaxPayments" readonly></div>
       <div><label>Nº recibos elegido</label><select id="globalPayments"></select></div>
       <div><label>Importe por recibo</label><input id="globalMonthly" readonly></div>
     </div>
@@ -582,48 +582,23 @@ function chgAquaMix(id,d){
  calcCurrent();
 }
 
-function promoTierFinance(o){
- const t=DATA[o.promo].tiers[o.tier];
- if(o.promo==="power"){
-   const map={10:2,15:3,20:4,30:6,50:8,60:9,70:10,90:10};
-   return map[t.buy]||1;
- }
- if(o.promo==="timeless"){
-   const map={8:2,12:3,18:4,24:5};
-   return map[t.buy]||1;
- }
- return 1;
-}
-function globalFinanceMax(total){
- const powerOrders=orders.filter(o=>o.promo==="power");
- const timelessOrders=orders.filter(o=>o.promo==="timeless");
-
- let max=1;
- powerOrders.forEach(o=>max=Math.max(max,promoTierFinance(o)));
- timelessOrders.forEach(o=>max=Math.max(max,promoTierFinance(o)));
-
- // Si el pedido combina ambas familias, se concede 1 recibo adicional.
- if(powerOrders.length && timelessOrders.length) max+=1;
-
- return max;
-}
-function setGlobalPaymentOptions(max){
+function setGlobalPaymentOptions(){
  const sel=$("globalPayments");
  const old=parseInt(sel.value||1);
  sel.innerHTML="";
- for(let i=1;i<=max;i++){
-   const o=document.createElement("option");o.value=i;
+ for(let i=1;i<=9;i++){
+   const o=document.createElement("option");
+   o.value=i;
    o.textContent=i===1?"Contado":(i===2?"2 recibos · 30/60 días":i+" recibos");
    sel.appendChild(o);
  }
- sel.value=String(Math.min(old,max));
+ sel.value=String(Math.min(Math.max(old,1),9));
 }
 function updateGlobalFinance(){
  if(!orders.length)return;
  const total=orders.reduce((s,o)=>s+o.total,0);
- const max=globalFinanceMax(total);
- $("globalMaxPayments").value=max===1?"Contado":max+" recibos";
- setGlobalPaymentOptions(max);
+ $("globalMaxPayments").value="Libre elección · 1 a 9 recibos";
+ setGlobalPaymentOptions();
  const n=parseInt($("globalPayments").value||1);
  $("globalMonthly").value=eur(total/n);
 }
@@ -889,10 +864,7 @@ function renderFinal(){
  if(showAmounts && gp>1) html+=` · ${eur(total/gp)} por recibo`;
  html+=`</div>`;
  $("finalPreview").innerHTML=html;
- if(combinedExtraMonth()){
-   $("combinedNote").classList.remove("hidden");
-   $("combinedNote").textContent="Power/Premium + Timeless Prodigy: se añade 1 recibo adicional al máximo permitido por los tramos seleccionados.";
- }else $("combinedNote").classList.add("hidden");
+ $("combinedNote").classList.add("hidden");
 }
 $("obs").addEventListener("input",renderFinal);
 

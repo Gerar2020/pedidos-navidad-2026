@@ -43,6 +43,60 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 
 
 
+
+.timelessBonusSummary{
+  margin-top:12px;
+  padding:12px;
+  border-radius:14px;
+  background:#fff8ef;
+  border:1px solid #e2c9a7;
+}
+.timelessBonusTitle{
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.04em;
+  color:#7a5932;
+  margin-bottom:8px;
+}
+.timelessBonusGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.timelessBonusItem{
+  background:#fff;
+  border:1px solid #ead9c1;
+  border-radius:12px;
+  padding:10px;
+  min-height:70px;
+}
+.timelessBonusItem .big{
+  display:block;
+  font-size:20px;
+  font-weight:900;
+  color:#171717;
+}
+.timelessBonusItem .small{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+  color:#6e6256;
+  line-height:1.2;
+  margin-top:3px;
+}
+.timelessBonusMeta{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid #e5d6c1;
+  font-size:11px;
+  color:#6e6256;
+  font-weight:700;
+  line-height:1.4;
+}
+@media(max-width:760px){
+  .timelessBonusGrid{grid-template-columns:1fr 1fr}
+}
+
 .bonusSummary{
   margin-top:12px;
   padding:12px;
@@ -965,10 +1019,32 @@ function renderDetail(){
  }
  if(currentPromo==="timeless"){
    const frag=PRODUCTS.perfumes[0];
-   html+=`<div class="bonusSection"><div class="sectionDivider">TESTER · SIN CARGO</div>
-   <div class="bonusAuto"><b>TESTER FRAGANCIAS · 1 UD. AUTOMÁTICA</b><br>
-     <span class="productMeta"><span class="productCode">Cód. art. ${frag[3]}</span> · Cód. aux. ${frag[4]} · ${frag[5]}<br>Se añade como tester, sin cargo, aparte de las fragancias de regalo de la promoción.</span>
-   </div></div>`;
+   const cream=productById("timelessCream");
+   html+=`<div class="bonusSection">
+     <div class="sectionDivider">BONIFICACIONES · SIN CARGO</div>
+     <div class="timelessBonusSummary">
+       <div class="timelessBonusTitle">TODO LO QUE SE LLEVA GRATIS EN ESTE TRAMO</div>
+       <div class="timelessBonusGrid">
+         <div class="timelessBonusItem">
+           <span class="big" id="timelessBonusCreamQty">${t.bonus}</span>
+           <span class="small">The Cream bonificada${t.bonus===1?"":"s"}</span>
+         </div>
+         <div class="timelessBonusItem">
+           <span class="big" id="timelessBonusPerfQty">${t.perf}</span>
+           <span class="small">fragancias de regalo</span>
+         </div>
+         <div class="timelessBonusItem">
+           <span class="big">1</span>
+           <span class="small">tester de fragancias</span>
+         </div>
+       </div>
+       <div class="timelessBonusMeta" id="timelessBonusMeta">
+         <b>The Cream:</b> Cód. art. ${cream[3]} · Aux. ${cream[4]} · ${cream[5]}<br>
+         <b>Fragancias:</b> Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]}<br>
+         <b>Material promocional:</b> ${t.b60} bolsas 60 aniversario · ${t.bex} bolsas exclusivas · ${t.kit} kit merchandising
+       </div>
+     </div>
+   </div>`;
  }
  if(currentPromo==="cabina"){
    html+=`<div class="bonusSection"><div class="sectionDivider">BONIFICACIÓN · SIN CARGO</div>
@@ -1177,6 +1253,17 @@ function calcCurrent(){
  
  if(currentPromo==="timeless"){
    updateTimelessUpgrade();
+   const creamQty=$("timelessBonusCreamQty");
+   const perfQty=$("timelessBonusPerfQty");
+   const meta=$("timelessBonusMeta");
+   if(creamQty)creamQty.textContent=count>=8?t.bonus:0;
+   if(perfQty)perfQty.textContent=count>=8?t.perf:0;
+   if(meta){
+     const cream=productById("timelessCream"),frag=PRODUCTS.perfumes[0];
+     meta.innerHTML=count>=8
+       ?`<b>The Cream:</b> Cód. art. ${cream[3]} · Aux. ${cream[4]} · ${cream[5]}<br><b>Fragancias:</b> Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]}<br><b>Material promocional:</b> ${t.b60} bolsas 60 aniversario · ${t.bex} bolsas exclusivas · ${t.kit} kit merchandising`
+       :`Al alcanzar el tramo 8 se mostrarán aquí todas las bonificaciones desbloqueadas.`;
+   }
    $("logicInfo").innerHTML=count<8
      ?`<b>Timeless Prodigy · selección abierta</b><br><span class="badge">Llevas ${count} cofres</span><span class="badge">Primer tramo: 8</span>`
      :`<b>Timeless Prodigy · tramo ${t.buy} alcanzado</b><br><span class="badge">${count} cofres seleccionados</span><span class="badge">Bonifica ${t.bonus} The Cream</span><span class="badge">Fragancias ${t.perf}</span><span class="badge">Tester 1</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
@@ -1266,14 +1353,14 @@ function orderLines(o){
     lines.push(`BONIFICADO · ${productOrderLine(prod,o.qty.bonGrasas)}`);
   }
   const frag=PRODUCTS.perfumes[0];
-  lines.push(`BONIFICACIÓN · FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+  lines.push(`BONIFICACIÓN · FRAGANCIAS DE BONIFICACIÓN · FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
   if(t.buy>10) lines.push(`BONIFICACIÓN · TESTER ADICIONAL · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
   lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`,`Descuento: ${t.disc}%`);
  }
  if(p==="timeless"){
    const cream=productById("timelessCream"),frag=PRODUCTS.perfumes[0];
-   lines.push(`BONIFICADO · Cód. art. ${cream[3]} · Aux. ${cream[4]} · ${cream[5]} · ${t.bonus} uds.`);
-   lines.push(`BONIFICACIÓN · FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+   lines.push(`BONIFICACIÓN · THE CREAM · Cód. art. ${cream[3]} · Aux. ${cream[4]} · ${cream[5]} · ${t.bonus} uds.`);
+   lines.push(`BONIFICACIÓN · FRAGANCIAS DE BONIFICACIÓN · FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
    lines.push(`BONIFICACIÓN · TESTER ADICIONAL · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
    lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`);
  }

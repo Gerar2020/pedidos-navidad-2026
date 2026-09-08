@@ -72,6 +72,50 @@ input,select,textarea{width:100%;font-size:17px;border:1px solid var(--line);bor
 
 
 
+
+.powerUpgradeCall strong{font-size:1.08em}
+.upgradeGain{
+  margin-top:10px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.upgradeGainItem{
+  background:#fff;
+  border:1px solid #d9c3a5;
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
+}
+.upgradeGainItem .num{
+  display:block;
+  font-size:21px;
+  font-weight:900;
+  color:#7b5a2f;
+  margin-bottom:2px;
+}
+.upgradeGainItem .lbl{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+  line-height:1.2;
+}
+.upgradeHeadline{
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius:12px;
+  background:#171717;
+  color:#fff;
+  font-size:14px;
+  font-weight:900;
+}
+.upgradeHeadline.near{
+  background:#7b5a2f;
+}
+@media(max-width:760px){
+  .upgradeGain{grid-template-columns:1fr 1fr}
+}
+
 .powerUpgrade{
   margin:14px 0;padding:15px;border-radius:16px;
   border:1px solid #d8bea0;background:#fff8ee;
@@ -482,6 +526,23 @@ function powerBenefitText(t){
   if(t.buy>10)parts.push(`1 tester`);
   return parts.join(" · ");
 }
+function powerUpgradeGain(current,next){
+  return {
+    aq:Math.max(0,(next.aq||0)-(current.aq||0)),
+    perf:Math.max(0,(next.perf||0)-(current.perf||0)),
+    disc:Math.max(0,(next.disc||0)-(current.disc||0)),
+    tester:(current.buy<=10 && next.buy>10)?1:0
+  };
+}
+function powerGainCards(g){
+  const items=[];
+  if(g.aq>0)items.push(`<div class="upgradeGainItem"><span class="num">+${g.aq}</span><span class="lbl">Aquatherm de regalo</span></div>`);
+  if(g.perf>0)items.push(`<div class="upgradeGainItem"><span class="num">+${g.perf}</span><span class="lbl">fragancias de regalo</span></div>`);
+  if(g.disc>0)items.push(`<div class="upgradeGainItem"><span class="num">+${g.disc}%</span><span class="lbl">descuento adicional</span></div>`);
+  if(g.tester>0)items.push(`<div class="upgradeGainItem"><span class="num">+1</span><span class="lbl">tester de fragancias</span></div>`);
+  return items.join("");
+}
+
 
 
 
@@ -586,8 +647,10 @@ function renderDetail(){
    html+=`<h3 id="powerBonusHeading">Aquatherm bonificados · todavía no desbloqueados</h3>`;
    html+=bonusRow("bonSecas","Aquatherm bonificado · normales a secas","aquaSecas")+bonusRow("bonGrasas","Aquatherm bonificado · normales a grasas","aquaGrasas");
    const frag=PRODUCTS.perfumes[0];
-   html+=`<div class="bonusAuto hidden" id="powerTesterAuto" style="margin-top:12px"><b>TESTER FRAGANCIAS · 1 UD. AUTOMÁTICA</b><br>
-     <span class="productMeta"><span class="productCode">Cód. art. ${frag[3]}</span> · Cód. aux. ${frag[4]} · ${frag[5]}<br>Se añade como tester, sin cargo, aparte de las fragancias de regalo de la promoción.</span>
+   html+=`<div class="bonusAuto hidden" id="powerFragranceAuto" style="margin-top:12px">
+     <b id="powerFragranceTitle">FRAGANCIAS INCLUIDAS</b><br>
+     <span class="productMeta"><span class="productCode">Cód. art. ${frag[3]}</span> · Cód. aux. ${frag[4]} · ${frag[5]}<br>
+     <span id="powerFragranceDetail"></span></span>
    </div>`;
    html+=`</div>`;
  }
@@ -742,17 +805,26 @@ function updatePowerUpgrade(){
 
  if(count<10){
    const left=10-count;
-   card.innerHTML=`<div class="powerUpgradeTop"><div><div class="powerUpgradeEyebrow">PRIMER OBJETIVO</div><div class="powerUpgradeTitle">Empieza a construir el pedido</div></div><div class="powerUpgradeNext">Faltan ${left} para promoción 10</div></div>
+   const first=DATA.power.tiers[0];
+   const g={aq:first.aq||0,perf:first.perf||0,disc:first.disc||0,tester:0};
+   card.innerHTML=`
+   <div class="powerUpgradeTop">
+     <div><div class="powerUpgradeEyebrow">PRIMER OBJETIVO</div><div class="powerUpgradeTitle">Llevas ${count} cofres</div></div>
+     <div class="powerUpgradeNext">Faltan ${left} para tramo 10</div>
+   </div>
    <div class="powerUpgradeBar"><div class="powerUpgradeFill" style="width:${Math.min(100,count/10*100)}%"></div></div>
-   <div class="powerUpgradeCall ${left<=3?"powerUpgradeNear":""}">Añade ${left} cofre${left===1?"":"s"} y desbloqueas: ${powerBenefitText(DATA.power.tiers[0])}.</div>`;
+   <div class="upgradeHeadline ${left<=3?"near":""}">Añade ${left} cofre${left===1?"":"s"} y desbloqueas la promoción de 10.</div>
+   <div class="upgradeGain">${powerGainCards(g)}</div>`;
    return;
  }
 
- const currentText=powerBenefitText(current);
  if(!next){
-   card.innerHTML=`<div class="powerUpgradeTop"><div><div class="powerUpgradeEyebrow">MÁXIMO ALCANZADO</div><div class="powerUpgradeTitle">Promoción 90 desbloqueada ✓</div></div></div>
+   card.innerHTML=`
+   <div class="powerUpgradeTop">
+     <div><div class="powerUpgradeEyebrow">MÁXIMO ALCANZADO</div><div class="powerUpgradeTitle">Promoción 90 desbloqueada ✓</div></div>
+   </div>
    <div class="powerUpgradeBar"><div class="powerUpgradeFill" style="width:100%"></div></div>
-   <div class="powerUpgradeCall">Beneficios actuales: ${currentText}.</div>`;
+   <div class="upgradeHeadline">Has alcanzado el máximo nivel de la campaña.</div>`;
    return;
  }
 
@@ -760,17 +832,23 @@ function updatePowerUpgrade(){
  const prevBuy=current.buy;
  const span=Math.max(1,next.buy-prevBuy);
  const pct=Math.max(0,Math.min(100,(count-prevBuy)/span*100));
- card.innerHTML=`<div class="powerUpgradeTop">
-   <div><div class="powerUpgradeEyebrow">PROMOCIÓN ACTUAL</div><div class="powerUpgradeTitle">${count} cofres · tramo ${current.buy}</div></div>
-   <div class="powerUpgradeNext">Siguiente: ${next.buy} · faltan ${remaining}</div>
+ const gain=powerUpgradeGain(current,next);
+
+ card.innerHTML=`
+ <div class="powerUpgradeTop">
+   <div><div class="powerUpgradeEyebrow">TRAMO ACTUAL</div><div class="powerUpgradeTitle">${count} cofres · promoción ${current.buy}</div></div>
+   <div class="powerUpgradeNext">Siguiente objetivo: ${next.buy}</div>
  </div>
  <div class="powerUpgradeBar"><div class="powerUpgradeFill" style="width:${pct}%"></div></div>
- <div class="powerUpgradeCompare">
-   <div class="powerBenefit"><b>Ahora · tramo ${current.buy}</b>${currentText}</div>
-   <div class="powerArrow">→</div>
-   <div class="powerBenefit"><b>Subiendo a ${next.buy}</b>${powerBenefitText(next)}</div>
+ <div class="upgradeHeadline ${remaining<=6?"near":""}">
+   ${remaining<=6?"⚡ ":""}Te faltan <b>${remaining}</b> cofre${remaining===1?"":"s"} para subir al tramo ${next.buy}.
  </div>
- <div class="powerUpgradeCall ${remaining<=6?"powerUpgradeNear":""}">${remaining<=6?"⚡ Estás muy cerca. ":""}Añade <b>${remaining}</b> cofre${remaining===1?"":"s"} más para mejorar la promoción.</div>`;
+ <div class="upgradeGain">${powerGainCards(gain)}</div>
+ <div class="powerUpgradeCompare" style="margin-top:10px">
+   <div class="powerBenefit"><b>Ahora tienes</b>${powerBenefitText(current)}</div>
+   <div class="powerArrow">→</div>
+   <div class="powerBenefit"><b>Al subir tendrás</b>${powerBenefitText(next)}</div>
+ </div>`;
 }
 
 function updateFloatingProgress(){
@@ -846,8 +924,22 @@ function calcCurrent(){
    updatePowerUpgrade();
    const bh=$("powerBonusHeading");
    if(bh)bh.textContent=t.aq>0?`Reparto de cofres Aquatherm bonificados · ${t.aq} disponibles`:"Aquatherm bonificados · se desbloquean desde el tramo 15";
-   const tester=$("powerTesterAuto");
-   if(tester)tester.classList.toggle("hidden",!(count>=15));
+   const fragranceBox=$("powerFragranceAuto");
+   if(fragranceBox){
+     fragranceBox.classList.toggle("hidden",count<10);
+     const title=$("powerFragranceTitle");
+     const detail=$("powerFragranceDetail");
+     if(title){
+       title.textContent=t.buy>10
+         ?`CON ESTE PEDIDO: ${t.perf} FRAGANCIAS + 1 TESTER`
+         :`CON ESTE PEDIDO: ${t.perf} FRAGANCIAS DE REGALO`;
+     }
+     if(detail){
+       detail.textContent=t.buy>10
+         ?`${t.perf} fragancias incluidas en la promoción + 1 unidad adicional como tester, todo sin cargo.`
+         :`${t.perf} fragancias incluidas en la promoción. El tramo de 10 no lleva tester.`;
+     }
+   }
    $("logicInfo").innerHTML=count<10
      ?`<b>Power & Premium · selección abierta</b><br><span class="badge">Llevas ${count} cofres</span><span class="badge">Primer tramo: 10</span><br>Selecciona libremente. La aplicación irá aplicando automáticamente el mejor tramo alcanzado.`
      :`<b>Power & Premium · tramo ${t.buy} alcanzado</b><br><span class="badge">${count} cofres seleccionados</span><span class="badge">Aquatherm ${t.aq}</span><span class="badge">Fragancias ${t.perf}</span>${t.buy>10?'<span class="badge">Tester 1</span>':''}<span class="badge">Descuento ${t.disc}%</span><br>Bolsas aniversario: <b>${t.b60}</b> · Exclusivas: <b>${t.bex}</b> · Kit: <b>${t.kit}</b>`;
@@ -937,15 +1029,15 @@ function orderLines(o){
     lines.push(`BONIFICADO · ${productOrderLine(prod,o.qty.bonGrasas)}`);
   }
   const frag=PRODUCTS.perfumes[0];
-  lines.push(`REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
-  if(t.buy>10) lines.push(`TESTER · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
+  lines.push(`FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+  if(t.buy>10) lines.push(`TESTER ADICIONAL · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
   lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`,`Descuento: ${t.disc}%`);
  }
  if(p==="timeless"){
    const cream=productById("timelessCream"),frag=PRODUCTS.perfumes[0];
    lines.push(`BONIFICADO · Cód. art. ${cream[3]} · Aux. ${cream[4]} · ${cream[5]} · ${t.bonus} uds.`);
-   lines.push(`REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
-   lines.push(`TESTER · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
+   lines.push(`FRAGANCIAS DE REGALO · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · ${t.perf} uds.`);
+   lines.push(`TESTER ADICIONAL · Cód. art. ${frag[3]} · Aux. ${frag[4]} · ${frag[5]} · 1 ud. · SIN CARGO`);
    lines.push(`Bolsas aniversario: ${t.b60}`,`Bolsas exclusivas: ${t.bex}`,`Kit merchandising: ${t.kit}`);
  }
  if(p==="cabina"){

@@ -1,18 +1,11 @@
-Pedidos Navidad 2026 · v21
+Pedidos Navidad 2026 · v22
 
-NUEVO ASISTENTE DE UPGRADE POWER & PREMIUM
-- Ya no se elige previamente 10 / 15 / 20 / 30 / 50 / 60 / 70 / 90.
-- El comercial selecciona cofres libremente entre 0 y 90.
-- La aplicación detecta automáticamente el mejor tramo alcanzado.
-- Muestra en tiempo real:
-  * número de cofres seleccionados,
-  * promoción/tramo actual,
-  * siguiente tramo,
-  * cuántos cofres faltan,
-  * ventajas actuales,
-  * ventajas que se desbloquean al subir.
-- Cuando faltan 6 cofres o menos, la llamada a la acción se intensifica.
-- La barra flotante pasa a medir el avance hacia el siguiente tramo.
-- Los Aquatherm bonificados se ajustan al tramo alcanzado.
-- Puede añadirse un pedido intermedio (por ejemplo 24 cofres) aplicando los beneficios del tramo 20.
-- Se mantiene el resto de familias sin cambios.
+UPGRADE REFORZADO
+- El siguiente tramo se comunica como una oportunidad comercial, no solo como progreso.
+- Se muestra de forma grande cuántos cofres faltan.
+- Se destacan por separado las mejoras que se ganan:
+  +X Aquatherm, +X fragancias, +X% descuento y tester cuando corresponda.
+- Se mantienen también las ventajas actuales frente a las del siguiente tramo.
+- La zona de bonificación Power & Premium muestra explícitamente las fragancias incluidas:
+  "CON ESTE PEDIDO: X FRAGANCIAS + 1 TESTER"
+  (el tramo de 10 no lleva tester).
